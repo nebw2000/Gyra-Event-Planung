@@ -6,190 +6,115 @@
 <title>Event bearbeiten</title>
 <style>
 body { font-family: Arial; margin:0; background:#f4f6f8; }
-header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
-header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
-.container { max-width:800px; margin:auto; padding:20px; background:white; border-radius:8px; margin-top:20px; }
-h2{ margin-top:0; }
-.form-group { margin-bottom:12px; }
-label{ display:block; font-weight:bold; margin-bottom:4px; color:#0f5f57; }
-input, select, textarea { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; font-size:14px; }
-button { background:#0f5f57; color:white; border:none; padding:10px 14px; border-radius:6px; cursor:pointer; margin-top:12px; }
+.container { max-width:500px; margin:20px auto; background:white; padding:20px; border-radius:8px; }
+label { display:block; margin-top:10px; font-weight:bold; }
+input, select, textarea { width:100%; padding:6px; margin-top:4px; border-radius:6px; border:1px solid #ccc; }
+button { margin-top:15px; padding:10px; width:100%; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
 #toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
 </style>
 </head>
 <body>
-<header>
-<h2>Event bearbeiten</h2>
-<button onclick="window.location.href='index.html'">Zur Übersicht</button>
-</header>
-
 <div class="container">
 <div id="toast"></div>
-<form id="eventForm">
-    <div class="form-group">
-        <label for="name">Eventname *</label>
-        <input id="name" type="text" required>
-    </div>
-    <div class="form-group">
-        <label for="leader">Leiter *</label>
-        <input id="leader" type="text" required>
-    </div>
-    <div class="form-group">
-        <label for="type">Eventtyp *</label>
-        <select id="type" required>
-            <option value="">-- Bitte wählen --</option>
-            <option>Probe</option>
-            <option>Konzert</option>
-            <option>Theater</option>
-            <option>Konferenz</option>
-            <option>Präsentation</option>
-            <option>Rede</option>
-            <option>Andere</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="location">Ort *</label>
-        <select id="location" required>
-            <option value="">-- Bitte wählen --</option>
-            <option>Atrium</option>
-            <option>Forum</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="date">Datum *</label>
-        <input id="date" type="date" required>
-    </div>
-    <div class="form-group">
-        <label for="time">Uhrzeit *</label>
-        <input id="time" type="time" required>
-    </div>
-    <div class="form-group">
-        <label for="mic">Mikrofone (1-5 oder mehr) *</label>
-        <select id="mic" required>
-            <option value="">-- Bitte wählen --</option>
-            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>mehr</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="vocals">Gesangs-Mikros (0-5 oder mehr) *</label>
-        <select id="vocals" required>
-            <option value="">-- Bitte wählen --</option>
-            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>mehr</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label><input type="checkbox" id="podium"> Rednerpult benötigt</label>
-    </div>
-    <div class="form-group">
-        <label for="beamer">Beamer *</label>
-        <select id="beamer" required>
-            <option value="">-- Bitte wählen --</option>
-            <option>Ja Bühne</option>
-            <option>Ja Wand</option>
-            <option>Ja beide</option>
-            <option>Nein</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="keyboard">Keyboards (0-5)</label>
-        <select id="keyboard">
-            <option value="">-- Bitte wählen --</option>
-            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="guitar">Gitarren (0-5)</label>
-        <select id="guitar">
-            <option value="">-- Bitte wählen --</option>
-            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="script">Skript (optional)</label>
-        <input type="file" id="script">
-    </div>
-    <div class="form-group">
-        <label for="comments">Kommentar (optional)</label>
-        <textarea id="comments"></textarea>
-    </div>
-    <button type="button" id="saveBtn">Speichern</button>
-</form>
+<h2>Event bearbeiten</h2>
+<label>Name</label><input id="name">
+<label>Leiter</label><input id="leader">
+<label>Typ</label>
+<select id="type">
+    <option>Probe</option>
+    <option>Konzert</option>
+    <option>Theater</option>
+    <option>Konferenz</option>
+    <option>Präsentation</option>
+    <option>Rede</option>
+    <option>Andere</option>
+</select>
+<label>Ort</label>
+<select id="location">
+    <option>Atrium</option>
+    <option>Forum</option>
+</select>
+<label>Micro Anzahl</label>
+<select id="mic"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>mehr</option></select>
+<label>Gesangs-Mic</label>
+<select id="vocMic"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>mehr</option></select>
+<label>Rednerpult</label><input type="checkbox" id="podium">
+<label>Beamer</label>
+<select id="beamer">
+    <option>Nein</option>
+    <option>Ja Bühne</option>
+    <option>Ja Wand</option>
+    <option>Ja beide</option>
+</select>
+<label>Keyboards</label>
+<select id="keyboard"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+<label>Gitarren</label>
+<select id="guitar"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+<label>Datum</label><input type="date" id="date">
+<label>Uhrzeit</label><input type="time" id="time">
+<label>Skript (optional)</label><input type="file" id="script">
+<label>Kommentar (optional)</label><textarea id="comments"></textarea>
+<button id="saveBtn">Speichern</button>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
+import { db } from "./firebase-config.js";
+import { ref, get, set } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
-  authDomain: "event-plan-c4b36.firebaseapp.com",
-  databaseURL: "https://event-plan-c4b36-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "event-plan-c4b36",
-  storageBucket: "event-plan-c4b36.appspot.com",
-  messagingSenderId: "489710650124",
-  appId: "1:489710650124:web:05423665acc223a83aff29",
-  measurementId: "G-KRY2MM4JEV"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 const toast = document.getElementById("toast");
 function showToast(msg){ toast.textContent=msg; toast.style.display="block"; setTimeout(()=>{toast.style.display="none";},3000); }
 
-if(!localStorage.getItem("userType")) window.location.href="login.html";
+const urlParams = new URLSearchParams(window.location.search);
+const eventId = urlParams.get("id");
+const saveBtn = document.getElementById("saveBtn");
 
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-
-if(!id) window.location.href="index.html";
-
-async function loadEvent(){
-    const snapshot = await get(ref(db,"events/"+id));
-    if(!snapshot.exists()){ showToast("Event nicht gefunden"); return; }
-    const e = snapshot.val();
-
-    document.getElementById("name").value = e.name;
-    document.getElementById("leader").value = e.leader;
-    document.getElementById("type").value = e.type;
-    document.getElementById("location").value = e.location;
-    if(e.date){
-        const parts = e.date.split(" ");
-        document.getElementById("date").value = parts[0];
-        document.getElementById("time").value = parts[1];
-    }
-    document.getElementById("mic").value = e.mic;
-    document.getElementById("vocals").value = e.vocals;
-    document.getElementById("podium").checked = e.podium==="Ja";
-    document.getElementById("beamer").value = e.beamer;
-    document.getElementById("keyboard").value = e.keyboard;
-    document.getElementById("guitar").value = e.guitar;
-    document.getElementById("comments").value = e.comments || "";
+if(!eventId) {
+    showToast("Keine Event-ID gefunden");
+    setTimeout(()=>window.location.href="index.html",2000);
 }
 
-document.getElementById("saveBtn").addEventListener("click", async ()=>{
-    const name = document.getElementById("name").value.trim();
-    const leader = document.getElementById("leader").value.trim();
-    const type = document.getElementById("type").value;
-    const location = document.getElementById("location").value;
-    const date = document.getElementById("date").value;
-    const time = document.getElementById("time").value;
-    const mic = document.getElementById("mic").value;
-    const vocals = document.getElementById("vocals").value;
-    const podium = document.getElementById("podium").checked?"Ja":"Nein";
-    const beamer = document.getElementById("beamer").value;
-    const keyboard = document.getElementById("keyboard").value||"0";
-    const guitar = document.getElementById("guitar").value||"0";
-    const script = document.getElementById("script").files[0]?document.getElementById("script").files[0].name:null;
-    const comments = document.getElementById("comments").value||"";
-
-    if(!name || !leader || !type || !location || !date || !time || !mic || !vocals || !beamer){
-        showToast("Bitte alle Pflichtfelder ausfüllen");
-        return;
+async function loadEvent(){
+    const snapshot = await get(ref(db,"events/"+eventId));
+    if(snapshot.exists()){
+        const e = snapshot.val();
+        document.getElementById("name").value = e.name;
+        document.getElementById("leader").value = e.leader;
+        document.getElementById("type").value = e.type;
+        document.getElementById("location").value = e.location;
+        document.getElementById("mic").value = e.mic;
+        document.getElementById("vocMic").value = e.vocMic;
+        document.getElementById("podium").checked = e.podium === "x";
+        document.getElementById("beamer").value = e.beamer;
+        document.getElementById("keyboard").value = e.keyboard;
+        document.getElementById("guitar").value = e.guitar;
+        document.getElementById("date").value = e.date;
+        document.getElementById("time").value = e.time;
+        document.getElementById("comments").value = e.comments || "";
+    } else {
+        showToast("Event nicht gefunden");
     }
+}
 
-    await set(ref(db,"events/"+id), {name, leader, type, location, date: date+" "+time, mic, vocals, podium, beamer, keyboard, guitar, script, comments});
-    showToast("Event aktualisiert!");
-    setTimeout(()=>{ window.location.href="index.html"; },1000);
+saveBtn.addEventListener("click", async ()=>{
+    const data = {
+        name: document.getElementById("name").value,
+        leader: document.getElementById("leader").value,
+        type: document.getElementById("type").value,
+        location: document.getElementById("location").value,
+        mic: document.getElementById("mic").value,
+        vocMic: document.getElementById("vocMic").value,
+        podium: document.getElementById("podium").checked ? "x" : "",
+        beamer: document.getElementById("beamer").value,
+        keyboard: document.getElementById("keyboard").value,
+        guitar: document.getElementById("guitar").value,
+        date: document.getElementById("date").value,
+        time: document.getElementById("time").value,
+        comments: document.getElementById("comments").value || "",
+        script: document.getElementById("script").files[0]?.name || ""
+    };
+    await set(ref(db,"events/"+eventId), data);
+    showToast("Event gespeichert!");
+    setTimeout(()=>window.location.href="index.html",1000);
 });
 
 loadEvent();
