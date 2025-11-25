@@ -1,143 +1,242 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Event Planung</title>
-    <style>
-        body { font-family: Arial; margin: 0; padding: 0; }
-        .hidden { display: none; }
-        header { padding: 15px; background: #222; color: #fff; }
-        button { padding: 8px 12px; margin: 5px; cursor: pointer; }
-        .container { padding: 20px; }
-        .event-box { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
-        input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; }
-        .btn-red { background: #d33; color: white; }
-        .btn-green { background: #4caf50; color: white; }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Event Manager</title>
+<style>
+  :root{
+    --brand:#0f5f57;
+    --muted:#f4f6f8;
+    --card:#ffffff;
+    --danger:#d9534f;
+    --ok:#73A19C;
+    --text:#222;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:Arial, Helvetica, sans-serif;
+    margin:0;
+    background:var(--muted);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Header */
+  header.app-header{
+    background:var(--brand);
+    color:#fff;
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  header.app-header h1{ font-size:18px; margin:0; }
+  .header-controls{ display:flex; gap:10px; align-items:center; }
+
+  button.btn{
+    border:0;
+    background:var(--brand);
+    color:#fff;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  button.ghost{ background:transparent; border:1px solid rgba(255,255,255,0.15); color:#fff; }
+  button.red{ background:var(--danger); color:#fff; }
+  button.green{ background:var(--ok); color:#fff; }
+
+  /* layout */
+  .wrap{ max-width:1100px; margin:22px auto; padding:0 16px; }
+  .grid{ display:grid; gap:18px; grid-template-columns: 1fr 360px; }
+
+  .card{ background:var(--card); padding:14px; border-radius:12px; box-shadow:0 6px 18px rgba(15,15,15,0.06); }
+
+  table{ width:100%; border-collapse:collapse; font-size:14px; }
+  thead th{ background:var(--brand); color:#fff; padding:12px; text-align:left; font-weight:600; }
+  tbody td{ padding:12px; border-bottom:1px solid #eee; vertical-align:middle; }
+  tbody tr:hover{ background:#fbfbfb; }
+  .actions{ display:flex; gap:8px; }
+
+  .form-title{ margin:0 0 8px 0; font-size:16px; color:var(--brand); }
+  label{ display:block; font-weight:600; font-size:13px; margin-top:10px; margin-bottom:6px; }
+  input[type="text"], input[type="date"], input[type="time"], select, textarea{
+    width:100%; padding:10px; border-radius:8px; border:1px solid #dcdcdc; font-size:14px;
+    background:transparent;
+  }
+  textarea{ min-height:90px; resize:vertical; }
+
+  .muted{ color:#6b6b6b; font-size:13px; }
+  .pill{ background:#f1f7f6; padding:4px 8px; border-radius:20px; font-size:13px; color:var(--brand); }
+
+  #detailsBox{ white-space:pre-wrap; font-family:monospace; font-size:13px; }
+
+  .login-center{ max-width:420px; margin:80px auto; padding:18px; background:var(--card); border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+  .login-center h2{ margin:0 0 10px 0; color:var(--brand); }
+  .login-row{ display:grid; gap:8px; margin-top:8px; }
+
+  #toast{ position:fixed; left:50%; transform:translateX(-50%); top:18px; background:var(--brand); color:#fff; padding:10px 14px; border-radius:10px; display:none; z-index:999; }
+
+  @media(max-width:980px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
 
+<div id="toast"></div>
+
 <!-- LOGIN -->
-<div id="loginPage" class="container">
-    <h2>Login</h2>
-    <input id="username" placeholder="Benutzer">
-    <input id="password" type="password" placeholder="Passwort">
-    <button id="loginBtn">Login</button>
-    <p id="loginError" style="color:red;"></p>
+<div id="loginView" class="login-center">
+  <h2>Anmelden</h2>
+  <div class="login-row">
+    <label class="muted">Rolle</label>
+    <select id="loginRole">
+      <option value="teacher">Lehrer*innen</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <label class="muted">Passwort</label>
+    <input id="loginPass" type="password" placeholder="Passwort eingeben">
+
+    <button id="loginBtn" class="btn">Login</button>
+    <div id="loginError" class="muted"></div>
+  </div>
 </div>
 
-<!-- HAUPTSEITE -->
-<div id="mainPage" class="hidden">
-    <header>
-        <h2>Event Übersicht</h2>
-        <button onclick="showCreateForm()">Neues Event</button>
-    </header>
-
-    <div class="container">
-        <div id="eventList"></div>
+<!-- APP -->
+<div id="app" style="display:none">
+  <header class="app-header">
+    <h1>Event-Übersicht</h1>
+    <div class="header-controls">
+      <span class="pill" id="userRolePill">Gast</span>
+      <button id="showCreateBtn" class="btn">+ Neues Event</button>
+      <button id="logoutBtn" class="btn ghost">Logout</button>
     </div>
+  </header>
+
+  <div class="wrap">
+    <div class="grid">
+      <!-- left -->
+      <div>
+        <div class="card">
+          <table aria-label="Eventliste">
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Uhrzeit</th>
+                <th>Event</th>
+                <th>Leiter</th>
+                <th>Ort</th>
+                <th>Aktion</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTbody"></tbody>
+          </table>
+          <div id="noEvents" class="muted" style="padding:12px; display:none;">Keine Events.</div>
+        </div>
+      </div>
+
+      <!-- right -->
+      <div>
+        <div id="panel" class="card">
+          <h3 class="form-title" id="panelTitle">Event hinzufügen</h3>
+
+          <div id="formWrap">
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <div style="flex:1">
+                <label>Name</label>
+                <input id="f_name" type="text" placeholder="Eventname">
+              </div>
+              <div style="width:180px">
+                <label>Datum</label>
+                <input id="f_date" type="date">
+              </div>
+            </div>
+
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;">
+              <div style="flex:1">
+                <label>Leiter</label>
+                <input id="f_leader" type="text" placeholder="Name Leiter">
+              </div>
+              <div style="width:120px">
+                <label>Zeit</label>
+                <input id="f_time" type="time">
+              </div>
+            </div>
+
+            <label>Typ</label>
+            <select id="f_type">
+              <option>Probe</option><option>Konzert</option><option>Theater</option>
+              <option>Konferenz</option><option>Präsentation</option><option>Rede</option><option>Andere</option>
+            </select>
+
+            <label>Ort</label>
+            <select id="f_location"><option>Atrium</option><option>Forum</option></select>
+
+            <div style="display:flex; gap:10px; margin-top:8px;">
+              <div style="flex:1">
+                <label>Mikrofone (gesamt)</label>
+                <select id="f_mic"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>Mehr</option></select>
+              </div>
+              <div style="flex:1">
+                <label>Gesangs-Mikros</label>
+                <select id="f_vocMic"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>Mehr</option></select>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:8px; align-items:center;">
+              <label style="margin:0;"><input id="f_podium" type="checkbox"> Rednerpult</label>
+              <div style="flex:1">
+                <label>Beamer</label>
+                <select id="f_beamer"><option>Nein</option><option>Ja Bühne</option><option>Ja Wand</option><option>Ja beide</option></select>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:8px;">
+              <div style="flex:1">
+                <label>Keyboards</label>
+                <select id="f_keyboard"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+              </div>
+              <div style="flex:1">
+                <label>Gitarren</label>
+                <select id="f_guitar"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+              </div>
+            </div>
+
+            <label style="margin-top:10px;">Skript (Link oder Dateiname, optional)</label>
+            <input id="f_script" type="text" placeholder="z.B. Skript-URL oder Dateiname">
+
+            <label>Kommentar (optional)</label>
+            <textarea id="f_comments" placeholder="Beschreibung / Ablauf"></textarea>
+
+            <div style="display:flex; gap:8px; margin-top:12px;">
+              <button id="saveBtn" class="btn green">Speichern</button>
+              <button id="cancelBtn" class="btn ghost">Abbrechen</button>
+            </div>
+          </div>
+
+          <div id="detailsWrap" style="display:none;">
+            <h4>Event Details</h4>
+            <pre id="detailsBox"></pre>
+            <div style="display:flex; gap:8px;">
+              <button id="detailsClose" class="btn ghost">Schliessen</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
-<!-- EVENT ERSTELLEN -->
-<div id="createPage" class="hidden container">
-    <h2>Event erstellen</h2>
-
-    <input id="evName" placeholder="Name">
-    <input id="evLeiter" placeholder="Leitung">
-
-    <label>Typ</label>
-    <select id="evTyp">
-        <option>Probe</option>
-        <option>Konzert</option>
-        <option>Theater</option>
-        <option>Konferenz</option>
-        <option>Präsentation</option>
-        <option>Rede</option>
-        <option>Andere</option>
-    </select>
-
-    <label>Ort</label>
-    <select id="evOrt">
-        <option>Atrium</option>
-        <option>Forum</option>
-    </select>
-
-    <label>Mikros</label>
-    <select id="evMic">
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
-        <option>Mehr</option>
-    </select>
-
-    <label>Gesangs Mikros</label>
-    <select id="evGesang">
-        <option>0</option>
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
-        <option>Mehr</option>
-    </select>
-
-    <label>Rednerpult</label>
-    <input type="checkbox" id="evPult">
-
-    <label>Beamer</label>
-    <select id="evBeamer">
-        <option>Nein</option>
-        <option>Ja Bühne</option>
-        <option>Ja Wand</option>
-        <option>Ja beide</option>
-    </select>
-
-    <label>Keyboards</label>
-    <select id="evKeys">
-        <option>0</option><option>1</option><option>2</option>
-        <option>3</option><option>4</option><option>5</option>
-    </select>
-
-    <label>Gitarren</label>
-    <select id="evGit">
-        <option>0</option><option>1</option><option>2</option>
-        <option>3</option><option>4</option><option>5</option>
-    </select>
-
-    <label>Skript (optional)</label>
-    <input id="evSkript" placeholder="Link zum Skript">
-
-    <label>Kommentar</label>
-    <textarea id="evKommentar"></textarea>
-
-    <label>Datum</label>
-    <input id="evDatum" type="date">
-
-    <label>Uhrzeit</label>
-    <input id="evZeit" type="time">
-
-    <button class="btn-green" onclick="saveEvent()">Speichern</button>
-    <button onclick="backToMain()">Zurück</button>
-
-    <p id="saveError" style="color:red;"></p>
-</div>
-
-<!-- EVENT DETAILS -->
-<div id="detailsPage" class="hidden container">
-    <h2>Event Details</h2>
-    <pre id="detailsBox"></pre>
-    <button onclick="backToMain()">Zurück</button>
-</div>
-
-<!-- FIREBASE -->
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove, update } 
-    from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
+/* Firebase config */
 const firebaseConfig = {
   apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
   authDomain: "event-plan-c4b36.firebaseapp.com",
@@ -151,107 +250,302 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const users = {
-    "lehrerin": "event",
-    "admin": "2309",
-    "ben": "1234"
-};
+/* Login (client-side) */
+const rolePill = document.getElementById("userRolePill");
+const loginView = document.getElementById("loginView");
+const appView = document.getElementById("app");
+const loginBtn = document.getElementById("loginBtn");
+const loginPass = document.getElementById("loginPass");
+const loginRole = document.getElementById("loginRole");
+const loginError = document.getElementById("loginError");
+const logoutBtn = document.getElementById("logoutBtn");
 
-document.getElementById("loginBtn").onclick = () => {
-    const u = username.value;
-    const p = password.value;
+let currentRole = null;
 
-    if (!users[u] || users[u] !== p) {
-        loginError.textContent = "Falsche Daten";
-        return;
-    }
-
-    loginPage.classList.add("hidden");
-    mainPage.classList.remove("hidden");
+loginBtn.addEventListener("click", ()=>{
+  const role = loginRole.value;
+  const pw = loginPass.value.trim();
+  if((role==="admin" && pw==="2309") || (role==="teacher" && pw==="event")){
+    loginError.textContent = "";
+    loginView.style.display = "none";
+    appView.style.display = "block";
+    currentRole = role;
+    rolePill.textContent = role==="admin" ? "Admin" : "Lehrer*in";
     loadEvents();
+  } else {
+    loginError.textContent = "Falsches Passwort";
+    showToast("Falsches Passwort");
+  }
+});
+
+logoutBtn.addEventListener("click", ()=>{
+  loginPass.value = "";
+  loginView.style.display = "block";
+  appView.style.display = "none";
+  currentRole = null;
+  rolePill.textContent = "Gast";
+});
+
+/* UI refs */
+const eventsTbody = document.getElementById("eventsTbody");
+const noEvents = document.getElementById("noEvents");
+const showCreateBtn = document.getElementById("showCreateBtn");
+const panelTitle = document.getElementById("panelTitle");
+const formWrap = document.getElementById("formWrap");
+const detailsWrap = document.getElementById("detailsWrap");
+const detailsBox = document.getElementById("detailsBox");
+const detailsClose = document.getElementById("detailsClose");
+const saveBtn = document.getElementById("saveBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+
+let editingKey = null;
+
+/* form fields */
+const F = {
+  name: document.getElementById("f_name"),
+  date: document.getElementById("f_date"),
+  time: document.getElementById("f_time"),
+  leader: document.getElementById("f_leader"),
+  type: document.getElementById("f_type"),
+  location: document.getElementById("f_location"),
+  mic: document.getElementById("f_mic"),
+  vocMic: document.getElementById("f_vocMic"),
+  podium: document.getElementById("f_podium"),
+  beamer: document.getElementById("f_beamer"),
+  keyboard: document.getElementById("f_keyboard"),
+  guitar: document.getElementById("f_guitar"),
+  script: document.getElementById("f_script"),
+  comments: document.getElementById("f_comments")
 };
 
-function loadEvents() {
-    const eventList = document.getElementById("eventList");
-    eventList.innerHTML = "";
+/* show create panel */
+showCreateBtn.addEventListener("click", openCreate);
 
-    const eventsRef = ref(db, "events");
-    onValue(eventsRef, snapshot => {
-        eventList.innerHTML = "";
+/* cancel */
+cancelBtn.addEventListener("click", ()=>{
+  clearForm();
+  hidePanels();
+});
 
-        snapshot.forEach(child => {
-            const id = child.key;
-            const ev = child.val();
+/* details close */
+detailsClose.addEventListener("click", hidePanels);
 
-            const div = document.createElement("div");
-            div.className = "event-box";
-            div.innerHTML = `
-                <b>${ev.name}</b><br>
-                ${ev.datum} ${ev.zeit}<br>
-                <button onclick="viewEvent('${id}')">Details</button>
-                <button onclick="editEvent('${id}')">Bearbeiten</button>
-                <button class="btn-red" onclick="deleteEvent('${id}')">Löschen</button>
-            `;
-            eventList.appendChild(div);
-        });
+/* save */
+saveBtn.addEventListener("click", async ()=>{
+  const data = {
+    name: (F.name.value || "").trim(),
+    leader: (F.leader.value || "").trim(),
+    type: (F.type.value || "").trim(),
+    location: (F.location.value || "").trim(),
+    mic: (F.mic.value || "").trim(),
+    vocMic: (F.vocMic.value || "").trim(),
+    podium: F.podium.checked ? "Ja" : "Nein",
+    beamer: (F.beamer.value || "").trim(),
+    keyboard: (F.keyboard.value || "").trim(),
+    guitar: (F.guitar.value || "").trim(),
+    script: (F.script.value || "").trim(),
+    comments: (F.comments.value || "").trim(),
+    date: (F.date.value || "").trim(),
+    time: (F.time.value || "").trim(),
+    timestamp: Date.now()
+  };
+
+  if(!data.name || !data.leader || !data.date || !data.time){
+    showToast("Bitte Name, Leiter, Datum und Zeit ausfüllen");
+    return;
+  }
+
+  if(editingKey){
+    try{
+      await update(ref(db, "events/" + editingKey), data);
+      showToast("Event aktualisiert");
+      editingKey = null;
+      clearForm();
+      hidePanels();
+    } catch(err){
+      console.error(err);
+      showToast("Fehler beim Aktualisieren");
+    }
+  } else {
+    try{
+      const nref = push(ref(db, "events"));
+      await set(nref, data);
+      showToast("Event gespeichert");
+      clearForm();
+      hidePanels();
+    } catch(err){
+      console.error(err);
+      showToast("Fehler beim Speichern");
+    }
+  }
+});
+
+/* load events */
+function loadEvents(){
+  const eventsRef = ref(db, "events");
+  onValue(eventsRef, snap => {
+    const val = snap.val() || {};
+    renderEvents(val);
+  }, err=>{
+    console.error("DB read error", err);
+    showToast("Fehler beim Laden");
+  });
+}
+
+function renderEvents(data){
+  eventsTbody.innerHTML = "";
+  const keys = Object.keys(data || {});
+  if(keys.length === 0){
+    noEvents.style.display = "block";
+    return;
+  } else {
+    noEvents.style.display = "none";
+  }
+
+  const arr = keys.map(k => ({ id: k, ...data[k] }));
+  arr.sort((a,b) => {
+    const da = new Date(a.date + " " + (a.time || "00:00"));
+    const db_ = new Date(b.date + " " + (b.time || "00:00"));
+    return da - db_;
+  });
+
+  for(const ev of arr){
+    const tr = document.createElement("tr");
+
+    const dateTd = document.createElement("td"); dateTd.textContent = ev.date || "-";
+    const timeTd = document.createElement("td"); timeTd.textContent = ev.time || "-";
+    const nameTd = document.createElement("td"); nameTd.textContent = ev.name || "-";
+    const leaderTd = document.createElement("td"); leaderTd.textContent = ev.leader || "-";
+    const locTd = document.createElement("td"); locTd.textContent = ev.location || "-";
+
+    const actionTd = document.createElement("td");
+    actionTd.className = "actions";
+
+    const btnDetail = document.createElement("button");
+    btnDetail.className = "btn";
+    btnDetail.textContent = "Details";
+    btnDetail.addEventListener("click", ()=> showDetails(ev));
+
+    const btnEdit = document.createElement("button");
+    btnEdit.className = "btn";
+    btnEdit.textContent = "Bearbeiten";
+    btnEdit.addEventListener("click", ()=> startEdit(ev.id, ev));
+
+    const btnDelete = document.createElement("button");
+    btnDelete.className = "btn red";
+    btnDelete.textContent = "Löschen";
+    btnDelete.addEventListener("click", ()=>{
+      if(confirm("Event wirklich löschen?")){
+        remove(ref(db, "events/" + ev.id)).then(()=> showToast("Event gelöscht")).catch(e=>{ console.error(e); showToast("Fehler"); });
+      }
     });
+
+    actionTd.appendChild(btnDetail);
+    actionTd.appendChild(btnEdit);
+    actionTd.appendChild(btnDelete);
+
+    tr.appendChild(dateTd);
+    tr.appendChild(timeTd);
+    tr.appendChild(nameTd);
+    tr.appendChild(leaderTd);
+    tr.appendChild(locTd);
+    tr.appendChild(actionTd);
+
+    eventsTbody.appendChild(tr);
+  }
 }
 
-function showCreateForm() {
-    mainPage.classList.add("hidden");
-    createPage.classList.remove("hidden");
+/* helpers */
+function openCreate(){
+  panelTitle.textContent = "Neues Event hinzufügen";
+  formWrap.style.display = "block";
+  detailsWrap.style.display = "none";
+  editingKey = null;
+  saveBtn.textContent = "Speichern";
+  clearForm();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function backToMain() {
-    createPage.classList.add("hidden");
-    detailsPage.classList.add("hidden");
-    mainPage.classList.remove("hidden");
+function startEdit(key, ev){
+  editingKey = key;
+  panelTitle.textContent = "Event bearbeiten";
+  formWrap.style.display = "block";
+  detailsWrap.style.display = "none";
+  saveBtn.textContent = "Aktualisieren";
+
+  F.name.value = ev.name || "";
+  F.leader.value = ev.leader || "";
+  F.type.value = ev.type || "Probe";
+  F.location.value = ev.location || "Atrium";
+  F.mic.value = ev.mic || "0";
+  F.vocMic.value = ev.vocMic || "0";
+  F.podium.checked = (ev.podium === "Ja");
+  F.beamer.value = ev.beamer || "Nein";
+  F.keyboard.value = ev.keyboard || "0";
+  F.guitar.value = ev.guitar || "0";
+  F.script.value = ev.script || "";
+  F.comments.value = ev.comments || "";
+  F.date.value = ev.date || "";
+  F.time.value = ev.time || "";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-window.saveEvent = () => {
-    const data = {
-        name: evName.value,
-        leiter: evLeiter.value,
-        typ: evTyp.value,
-        ort: evOrt.value,
-        mic: evMic.value,
-        gesang: evGesang.value,
-        pult: evPult.checked,
-        beamer: evBeamer.value,
-        keys: evKeys.value,
-        git: evGit.value,
-        skript: evSkript.value,
-        kommentar: evKommentar.value,
-        datum: evDatum.value,
-        zeit: evZeit.value
-    };
+function showDetails(ev){
+  formWrap.style.display = "none";
+  detailsWrap.style.display = "block";
+  const txt = [
+    `Name: ${ev.name || "-"}`,
+    `Leiter: ${ev.leader || "-"}`,
+    `Typ: ${ev.type || "-"}`,
+    `Ort: ${ev.location || "-"}`,
+    `Datum: ${ev.date || "-"}`,
+    `Uhrzeit: ${ev.time || "-"}`,
+    `Mikrofone (gesamt): ${ev.mic || "-"}`,
+    `Gesangs-Mikros: ${ev.vocMic || "-"}`,
+    `Rednerpult: ${ev.podium || "-"}`,
+    `Beamer: ${ev.beamer || "-"}`,
+    `Keyboards: ${ev.keyboard || "-"}`,
+    `Gitarren: ${ev.guitar || "-"}`,
+    `Skript: ${ev.script || "-"}`,
+    `Kommentar: ${ev.comments || "-"}`
+  ].join("\n");
+  detailsBox.textContent = txt;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
-    push(ref(db, "events"), data)
-        .then(() => {
-            backToMain();
-        })
-        .catch(() => saveError.textContent = "Fehler beim Speichern");
-};
+function hidePanels(){
+  formWrap.style.display = "block";
+  detailsWrap.style.display = "none";
+}
 
-window.deleteEvent = id => {
-    remove(ref(db, "events/" + id));
-};
+function clearForm(){
+  F.name.value = "";
+  F.leader.value = "";
+  F.type.selectedIndex = 0;
+  F.location.selectedIndex = 0;
+  F.mic.selectedIndex = 0;
+  F.vocMic.selectedIndex = 0;
+  F.podium.checked = false;
+  F.beamer.selectedIndex = 0;
+  F.keyboard.selectedIndex = 0;
+  F.guitar.selectedIndex = 0;
+  F.script.value = "";
+  F.comments.value = "";
+  F.date.value = "";
+  F.time.value = "";
+}
 
-window.viewEvent = id => {
-    createPage.classList.add("hidden");
-    mainPage.classList.add("hidden");
-    detailsPage.classList.remove("hidden");
+function showToast(msg, time=2200){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  setTimeout(()=> t.style.display = "none", time);
+}
 
-    onValue(ref(db, "events/" + id), snap => {
-        detailsBox.textContent = JSON.stringify(snap.val(), null, 2);
-    });
-};
-
-window.editEvent = id => {
-    alert("Bearbeiten baue ich dir als Nächstes ein.");
-};
-
+/* start UI state */
+hidePanels();
+openCreate();
 </script>
-
 </body>
 </html>
