@@ -1,19 +1,22 @@
-// Firebase App konfigurieren
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database";
+// firebase-config.js
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
 
+// Deine Firebase-Konfiguration hier einfügen
 const firebaseConfig = {
-  apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
-  authDomain: "event-plan-c4b36.firebaseapp.com",
-  databaseURL: "https://event-plan-c4b36-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "event-plan-c4b36",
-  storageBucket: "event-plan-c4b36.appspot.com",
-  messagingSenderId: "489710650124",
-  appId: "1:489710650124:web:6a515ffd6ec3d9983aff29",
-  measurementId: "G-CPW8C0JVZX"
+  apiKey: "DEIN_API_KEY",
+  authDomain: "DEIN_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://DEIN_PROJECT_ID-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "DEIN_PROJECT_ID",
+  storageBucket: "DEIN_PROJECT_ID.appspot.com",
+  messagingSenderId: "DEIN_MESSAGING_SENDER_ID",
+  appId: "DEIN_APP_ID",
+  measurementId: "DEIN_MEASUREMENT_ID"
 };
 
+// Firebase initialisieren
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+
+// Datenbank exportieren
 export const db = getDatabase(app);
