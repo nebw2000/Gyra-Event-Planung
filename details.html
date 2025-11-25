@@ -5,101 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Event Details</title>
 <style>
-body { font-family: Arial; margin:0; background:#f4f6f8; }
-.container { max-width:600px; margin:20px auto; background:white; padding:20px; border-radius:8px; }
-h2 { margin-top:0; color:#0f5f57; }
-p { margin:8px 0; }
-button { margin:5px 0; padding:10px; width:48%; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
-#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
+body { font-family: Arial; margin:0; background:#f4f6f8; padding:20px; }
+h2 { color:#0f5f57; }
+div { margin-bottom:10px; }
+button { padding:8px 12px; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
 </style>
 </head>
 <body>
-<div class="container">
-<div id="toast"></div>
-<h2 id="eventName">Event</h2>
-<p><strong>Leiter:</strong> <span id="leader"></span></p>
-<p><strong>Typ:</strong> <span id="type"></span></p>
-<p><strong>Ort:</strong> <span id="location"></span></p>
-<p><strong>Micro:</strong> <span id="mic"></span></p>
-<p><strong>Gesangs-Mic:</strong> <span id="vocMic"></span></p>
-<p><strong>Rednerpult:</strong> <span id="podium"></span></p>
-<p><strong>Beamer:</strong> <span id="beamer"></span></p>
-<p><strong>Keyboards:</strong> <span id="keyboard"></span></p>
-<p><strong>Gitarren:</strong> <span id="guitar"></span></p>
-<p><strong>Datum:</strong> <span id="date"></span></p>
-<p><strong>Uhrzeit:</strong> <span id="time"></span></p>
-<p><strong>Skript:</strong> <span id="script"></span></p>
-<p><strong>Kommentar:</strong> <span id="comments"></span></p>
-
-<button id="editBtn">Bearbeiten</button>
-<button id="deleteBtn" style="background:#d9534f;">Löschen</button>
-</div>
+<button onclick="window.location.href='index.html'">Zurück</button>
+<h2>Event Details</h2>
+<div id="details"></div>
 
 <script type="module">
 import { db } from "./firebase-config.js";
-import { ref, get, remove } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
+import { ref, get } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
 
-const toast = document.getElementById("toast");
-function showToast(msg){ toast.textContent=msg; toast.style.display="block"; setTimeout(()=>{toast.style.display="none";},3000); }
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+const detailsEl = document.getElementById("details");
 
-const urlParams = new URLSearchParams(window.location.search);
-const eventId = urlParams.get("id");
-if(!eventId){ showToast("Keine Event-ID"); setTimeout(()=>window.location.href="index.html",1500); }
-
-const fields = {
-    eventName: document.getElementById("eventName"),
-    leader: document.getElementById("leader"),
-    type: document.getElementById("type"),
-    location: document.getElementById("location"),
-    mic: document.getElementById("mic"),
-    vocMic: document.getElementById("vocMic"),
-    podium: document.getElementById("podium"),
-    beamer: document.getElementById("beamer"),
-    keyboard: document.getElementById("keyboard"),
-    guitar: document.getElementById("guitar"),
-    date: document.getElementById("date"),
-    time: document.getElementById("time"),
-    script: document.getElementById("script"),
-    comments: document.getElementById("comments")
-};
-
-async function loadEvent(){
-    const snapshot = await get(ref(db,"events/"+eventId));
+async function loadDetails(){
+    const snapshot = await get(ref(db,"events/"+id));
     if(snapshot.exists()){
         const e = snapshot.val();
-        fields.eventName.textContent = e.name;
-        fields.leader.textContent = e.leader;
-        fields.type.textContent = e.type;
-        fields.location.textContent = e.location;
-        fields.mic.textContent = e.mic;
-        fields.vocMic.textContent = e.vocMic;
-        fields.podium.textContent = e.podium==="x"?"Ja":"Nein";
-        fields.beamer.textContent = e.beamer;
-        fields.keyboard.textContent = e.keyboard;
-        fields.guitar.textContent = e.guitar;
-        fields.date.textContent = e.date;
-        fields.time.textContent = e.time;
-        fields.script.textContent = e.script || "-";
-        fields.comments.textContent = e.comments || "-";
+        detailsEl.innerHTML=`
+            <strong>Name:</strong> ${e.name}<br>
+            <strong>Leiter:</strong> ${e.leader}<br>
+            <strong>Typ:</strong> ${e.type}<br>
+            <strong>Ort:</strong> ${e.location}<br>
+            <strong>Datum:</strong> ${e.date}<br>
+            <strong>Uhrzeit:</strong> ${e.time}<br>
+            <strong>Mic:</strong> ${e.mic}<br>
+            <strong>Gesangs-Mic:</strong> ${e.vocMic}<br>
+            <strong>Rednerpult:</strong> ${e.podium}<br>
+            <strong>Beamer:</strong> ${e.beamer}<br>
+            <strong>Keyboards:</strong> ${e.keyboard}<br>
+            <strong>Gitarren:</strong> ${e.guitar}<br>
+            <strong>Skript:</strong> ${e.script||"-"}<br>
+            <strong>Kommentar:</strong> ${e.comments||"-"}
+        `;
     } else {
-        showToast("Event nicht gefunden");
-        setTimeout(()=>window.location.href="index.html",1500);
+        detailsEl.textContent="Event nicht gefunden";
     }
 }
 
-document.getElementById("editBtn").addEventListener("click", ()=>{
-    window.location.href = "edit.html?id="+eventId;
-});
-
-document.getElementById("deleteBtn").addEventListener("click", async ()=>{
-    if(confirm("Event wirklich löschen?")){
-        await remove(ref(db,"events/"+eventId));
-        showToast("Event gelöscht!");
-        setTimeout(()=>window.location.href="index.html",1000);
-    }
-});
-
-loadEvent();
+loadDetails();
 </script>
 </body>
 </html>
