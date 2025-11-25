@@ -5,177 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Neues Event</title>
 <style>
-    body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:flex-start; padding-top:20px; }
-    .container { background:white; padding:30px; border-radius:8px; width:100%; max-width:600px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-    h2 { margin-top:0; color:#0f5f57; }
-    label { display:block; font-weight:bold; margin:10px 0 4px; }
-    input, select { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; }
-    input[type="checkbox"] { width:auto; }
-    button { width:100%; padding:10px; margin-top:15px; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
-    #toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
+body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:flex-start; padding-top:30px; }
+.container { background:white; padding:30px; border-radius:8px; width:100%; max-width:500px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+h2 { margin-top:0; color:#0f5f57; }
+label { display:block; font-weight:bold; margin:10px 0 4px; }
+input, select { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-bottom:10px; }
+button { width:100%; padding:10px; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
+#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
 </style>
 </head>
 <body>
-
 <div class="container">
     <div id="toast"></div>
     <h2>Neues Event</h2>
-    
-    <label for="name">Name</label>
-    <input id="name" type="text" required>
-
-    <label for="leader">Leiter</label>
-    <input id="leader" type="text" required>
-
-    <label for="type">Typ</label>
+    <label>Name</label><input id="name">
+    <label>Leiter</label><input id="leader">
+    <label>Typ</label>
     <select id="type">
-        <option>Probe</option>
-        <option>Konzert</option>
-        <option>Theater</option>
-        <option>Konferenz</option>
-        <option>Präsentation</option>
-        <option>Rede</option>
-        <option>Andere</option>
+        <option value="Probe">Probe</option>
+        <option value="Konzert">Konzert</option>
+        <option value="Theater">Theater</option>
+        <option value="Konferenz">Konferenz</option>
+        <option value="Präsentation">Präsentation</option>
+        <option value="Rede">Rede</option>
+        <option value="Andere">Andere</option>
     </select>
-
-    <label for="location">Ort</label>
+    <label>Ort</label>
     <select id="location">
-        <option>Atrium</option>
-        <option>Forum</option>
+        <option value="Atrium">Atrium</option>
+        <option value="Forum">Forum</option>
     </select>
-
-    <label for="mic">Mikros</label>
+    <label>Mic Anzahl</label>
     <select id="mic">
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
-        <option>Mehr</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="Mehr">Mehr</option>
     </select>
-
-    <label for="vocals">Gesangs-Mikros</label>
-    <select id="vocals">
-        <option>0</option>
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
-        <option>Mehr</option>
+    <label>Gesangs-Mics</label>
+    <select id="vocMic">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="Mehr">Mehr</option>
     </select>
-
     <label><input type="checkbox" id="podium"> Rednerpult benötigt</label>
-
-    <label for="beamer">Beamer</label>
+    <label>Beamer</label>
     <select id="beamer">
-        <option>Nein</option>
-        <option>Ja Bühne</option>
-        <option>Ja Wand</option>
-        <option>Ja beide</option>
+        <option value="Nein">Nein</option>
+        <option value="Bühne">Ja Bühne</option>
+        <option value="Wand">Ja Wand</option>
+        <option value="Beide">Ja beide</option>
     </select>
-
-    <label for="keyboard">Keyboards</label>
+    <label>Keyboards</label>
     <select id="keyboard">
-        <option>0</option>
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
     </select>
-
-    <label for="guitar">Gitarren</label>
+    <label>Gitarren</label>
     <select id="guitar">
-        <option>0</option>
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
-        <option>4</option>
-        <option>5</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
     </select>
-
-    <label for="date">Datum</label>
-    <input id="date" type="date" required>
-
-    <label for="time">Uhrzeit</label>
-    <input id="time" type="time" required>
-
-    <label for="script">Skript (optional)</label>
-    <input id="script" type="file">
-
-    <label for="comments">Kommentar (optional)</label>
-    <input id="comments" type="text">
-
+    <label>Skript (optional)</label>
+    <input type="file" id="script">
+    <label>Kommentar (optional)</label>
+    <input id="comments">
+    <label>Datum</label>
+    <input type="date" id="date">
+    <label>Uhrzeit</label>
+    <input type="time" id="time">
     <button id="saveBtn">Speichern</button>
 </div>
 
 <script type="module">
-import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-auth.js";
+import { db } from "./firebase-config.js";
 import { ref, push } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
-
-// LOGIN SCHUTZ
-onAuthStateChanged(auth, user => { if(!user) window.location.href="login.html"; });
-
-const fields = {
-    name: document.getElementById("name"),
-    leader: document.getElementById("leader"),
-    type: document.getElementById("type"),
-    location: document.getElementById("location"),
-    mic: document.getElementById("mic"),
-    vocals: document.getElementById("vocals"),
-    podium: document.getElementById("podium"),
-    beamer: document.getElementById("beamer"),
-    keyboard: document.getElementById("keyboard"),
-    guitar: document.getElementById("guitar"),
-    date: document.getElementById("date"),
-    time: document.getElementById("time"),
-    script: document.getElementById("script"),
-    comments: document.getElementById("comments")
-};
 
 const saveBtn = document.getElementById("saveBtn");
 const toast = document.getElementById("toast");
-
-function showToast(msg){
-    toast.textContent = msg;
-    toast.style.display="block";
-    setTimeout(()=>{toast.style.display="none";},3000);
-}
+function showToast(msg){ toast.textContent=msg; toast.style.display="block"; setTimeout(()=>{ toast.style.display="none"; },2000); }
 
 saveBtn.addEventListener("click", async ()=>{
-    if(!fields.name.value || !fields.leader.value || !fields.date.value || !fields.time.value){
+    const updated = {
+        name: document.getElementById("name").value,
+        leader: document.getElementById("leader").value,
+        type: document.getElementById("type").value,
+        location: document.getElementById("location").value,
+        mic: document.getElementById("mic").value,
+        vocMic: document.getElementById("vocMic").value,
+        podium: document.getElementById("podium").checked?"x":"",
+        beamer: document.getElementById("beamer").value,
+        keyboard: document.getElementById("keyboard").value,
+        guitar: document.getElementById("guitar").value,
+        script: document.getElementById("script").files[0]?document.getElementById("script").files[0].name:null,
+        comments: document.getElementById("comments").value,
+        date: document.getElementById("date").value,
+        time: document.getElementById("time").value
+    };
+
+    if(!updated.name || !updated.leader || !updated.type || !updated.location || !updated.date || !updated.time){
         showToast("Bitte alle Pflichtfelder ausfüllen");
         return;
     }
 
-    const updated = {
-        name: fields.name.value,
-        leader: fields.leader.value,
-        type: fields.type.value,
-        location: fields.location.value,
-        mic: fields.mic.value,
-        vocals: fields.vocals.value,
-        podium: fields.podium.checked ? "X" : "",
-        beamer: fields.beamer.value,
-        keyboard: fields.keyboard.value,
-        guitar: fields.guitar.value,
-        date: fields.date.value,
-        time: fields.time.value,
-        script: fields.script.files[0]?fields.script.files[0].name:null,
-        comments: fields.comments.value || ""
-    };
-
-    try{
-        await push(ref(db,"events"), updated);
-        showToast("Event erfolgreich gespeichert!");
-        setTimeout(()=>{ window.location.href="index.html"; },1000);
-    }catch(e){
-        showToast("Fehler: "+e.message);
-    }
+    await push(ref(db,"events"), updated);
+    showToast("Event gespeichert!");
+    setTimeout(()=>{ window.location.href="index.html"; },500);
 });
 </script>
-
 </body>
 </html>
