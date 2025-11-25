@@ -28,7 +28,7 @@ textarea { resize:none; }
 button.saveBtn { background:#1b2a49; color:white; width:100%; padding:12px; font-weight:bold; margin-top:15px; border-radius:8px; cursor:pointer; transition:0.3s; }
 button.saveBtn:hover { background:#34495e; }
 
-#toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#1b2a49; padding:12px 20px; color:white; border-radius:10px; display:none; font-weight:500; }
+#toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#1b2a49; padding:12px 20px; color:white; border-radius:10px; display:none; font-weight:500; text-align:center; }
 
 /* Login */
 #loginContainer { display:flex; height:100vh; justify-content:center; align-items:center; background:#1b2a49; }
@@ -149,7 +149,7 @@ button.saveBtn:hover { background:#34495e; }
 </div>
 
 <script type="module">
-// Import Firebase
+// Firebase import
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -190,28 +190,13 @@ addEventBtn.addEventListener('click', () => {
     addEventForm.style.display = addEventForm.style.display==='none'?'block':'none';
 });
 
-// Event speichern
-const saveEventBtn = document.getElementById('saveEvent');
-saveEventBtn.addEventListener('click', () => {
-    const eventData = {
-        name: document.getElementById('name').value,
-        leader: document.getElementById('leader').value,
-        type: document.getElementById('type').value,
-        location: document.getElementById('location').value,
-        mic: document.getElementById('mic').value,
-        vocals: document.getElementById('vocals').value,
-        podium: document.getElementById('podium').value,
-        beamer: document.getElementById('beamer').value,
-        keyboard: document.getElementById('keyboard').value,
-        guitar: document.getElementById('guitar').value,
-        comments: document.getElementById('comments').value,
-        date: document.getElementById('eventDate').value
-    };
-    const eventsRef = ref(db, 'events');
-    push(eventsRef, eventData);
-    addEventForm.reset();
-    addEventForm.style.display='none';
-});
+// Toast Funktion
+function showToast(msg){
+    const toast = document.getElementById('toast');
+    toast.innerText = msg;
+    toast.style.display='block';
+    setTimeout(()=>{toast.style.display='none';},3000);
+}
 
 // Events laden
 const eventsContainer = document.getElementById('eventsContainer');
@@ -246,8 +231,7 @@ function loadEvents(){
 
 // Event löschen
 window.deleteEvent = function(id){
-    const confirmDel = confirm('Event wirklich löschen?');
-    if(confirmDel){
+    if(confirm('Event wirklich löschen?')){
         remove(ref(db, 'events/'+id));
     }
 }
@@ -288,12 +272,13 @@ window.editEvent = function(id){
             });
             addEventForm.reset();
             addEventForm.style.display='none';
+            showToast('Event aktualisiert!');
             saveEventBtn.onclick = saveNewEvent;
         };
     });
 }
 
-// Standard Speichern für neue Events
+// Neues Event speichern (nur einmal)
 function saveNewEvent(){
     const eventData = {
         name: document.getElementById('name').value,
@@ -313,7 +298,11 @@ function saveNewEvent(){
     push(eventsRef, eventData);
     addEventForm.reset();
     addEventForm.style.display='none';
+    showToast('Event gespeichert!');
+    loadEvents(); // zurück zur Übersicht
 }
+
+const saveEventBtn = document.getElementById('saveEvent');
 saveEventBtn.onclick = saveNewEvent;
 
 </script>
