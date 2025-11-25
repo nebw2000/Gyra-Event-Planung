@@ -1,1 +1,161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neues Event</title>
+<style>
+    body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:flex-start; padding-top:30px; }
+    .container { background:white; padding:30px; border-radius:8px; width:100%; max-width:600px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    h2 { margin-top:0; color:#0f5f57; }
+    label { display:block; font-weight:bold; margin:10px 0 4px; }
+    input, select { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-bottom:10px; }
+    input[type="checkbox"] { width:auto; }
+    button { width:100%; padding:10px; margin-top:15px; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
+    #toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
+</style>
+</head>
+<body>
 
+<div class="container">
+    <div id="toast"></div>
+    <h2>Neues Event erstellen</h2>
+
+    <label for="name">Event Name</label>
+    <input id="name" type="text" required>
+
+    <label for="leader">Leiter</label>
+    <input id="leader" type="text" required>
+
+    <label for="type">Typ</label>
+    <select id="type" required>
+        <option value="">Bitte wählen</option>
+        <option value="Probe">Probe</option>
+        <option value="Konzert">Konzert</option>
+        <option value="Theater">Theater</option>
+        <option value="Konferenz">Konferenz</option>
+        <option value="Präsentation">Präsentation</option>
+        <option value="Rede">Rede</option>
+        <option value="Andere">Andere</option>
+    </select>
+
+    <label for="location">Ort</label>
+    <select id="location" required>
+        <option value="">Bitte wählen</option>
+        <option value="Atrium">Atrium</option>
+        <option value="Forum">Forum</option>
+    </select>
+
+    <label for="mic">Wie viele Mikrofone?</label>
+    <select id="mic" required>
+        <option value="">Bitte wählen</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="Mehr">Mehr</option>
+    </select>
+
+    <label for="singerMic">Gesangs-Mikrofone</label>
+    <select id="singerMic">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="Mehr">Mehr</option>
+    </select>
+
+    <label for="podium">Rednerpult</label>
+    <input id="podium" type="checkbox">
+
+    <label for="beamer">Beamer</label>
+    <select id="beamer" required>
+        <option value="">Bitte wählen</option>
+        <option value="Bühne">Ja Bühne</option>
+        <option value="Wand">Ja Wand</option>
+        <option value="Beide">Ja beide</option>
+        <option value="Nein">Nein</option>
+    </select>
+
+    <label for="keyboard">Keyboards</label>
+    <select id="keyboard" required>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+
+    <label for="guitar">Gitarren</label>
+    <select id="guitar" required>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+
+    <label for="date">Datum</label>
+    <input type="date" id="date" required>
+
+    <label for="time">Uhrzeit</label>
+    <input type="time" id="time" required>
+
+    <label for="script">Skript (optional)</label>
+    <input type="file" id="script">
+
+    <label for="comments">Kommentar (optional)</label>
+    <input type="text" id="comments">
+
+    <button id="saveBtn">Speichern</button>
+</div>
+
+<script type="module">
+import { db } from "./firebase-config.js";
+import { ref, push, set } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
+
+const saveBtn = document.getElementById("saveBtn");
+const toast = document.getElementById("toast");
+
+function showToast(msg){
+    toast.textContent = msg;
+    toast.style.display="block";
+    setTimeout(()=>{toast.style.display="none";},3000);
+}
+
+saveBtn.addEventListener("click", async ()=>{
+    const name = document.getElementById("name").value.trim();
+    const leader = document.getElementById("leader").value.trim();
+    const type = document.getElementById("type").value;
+    const location = document.getElementById("location").value;
+    const mic = document.getElementById("mic").value;
+    const singerMic = document.getElementById("singerMic").value;
+    const podium = document.getElementById("podium").checked;
+    const beamer = document.getElementById("beamer").value;
+    const keyboard = document.getElementById("keyboard").value;
+    const guitar = document.getElementById("guitar").value;
+    const date = document.getElementById("date").value;
+    const time = document.getElementById("time").value;
+    const comments = document.getElementById("comments").value || "";
+    const scriptFile = document.getElementById("script").files[0];
+    const script = scriptFile ? scriptFile.name : "";
+
+    if(!name || !leader || !type || !location || !mic || !beamer || !keyboard || !guitar || !date || !time){
+        showToast("Bitte alle Pflichtfelder ausfüllen");
+        return;
+    }
+
+    const newEventRef = push(ref(db,"events"));
+    await set(newEventRef, { name, leader, type, location, mic, singerMic, podium, beamer, keyboard, guitar, date, time, comments, script });
+
+    showToast("Event erstellt!");
+    setTimeout(()=>{ window.location.href="index.html"; },1000);
+});
+</script>
+</body>
+</html>
