@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Details</title>
+<style>
+body { font-family: Arial; margin:0; background:#f4f6f8; }
+header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
+header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
+.container { max-width:800px; margin:auto; padding:20px; background:white; border-radius:8px; margin-top:20px; }
+h2{ margin-top:0; }
+.detail { margin-bottom:10px; }
+.label { font-weight:bold; color:#0f5f57; }
+#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
+</style>
+</head>
+<body>
+<header>
+<h2>Event Details</h2>
+<button onclick="window.location.href='index.html'">Zur Übersicht</button>
+</header>
+
+<div class="container" id="details">
+<div id="toast"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
+  authDomain: "event-plan-c4b36.firebaseapp.com",
+  databaseURL: "https://event-plan-c4b36-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "event-plan-c4b36",
+  storageBucket: "event-plan-c4b36.appspot.com",
+  messagingSenderId: "489710650124",
+  appId: "1:489710650124:web:05423665acc223a83aff29",
+  measurementId: "G-KRY2MM4JEV"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const toast = document.getElementById("toast");
+function showToast(msg){ toast.textContent=msg; toast.style.display="block"; setTimeout(()=>{toast.style.display="none";},3000); }
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+if(!id) window.location.href="index.html";
+
+async function loadDetails(){
+    const snapshot = await get(ref(db,"events/"+id));
+    if(!snapshot.exists()){ showToast("Event nicht gefunden"); return; }
+    const e = snapshot.val();
+
+    const container = document.getElementById("details");
+    container.innerHTML = `
+        <div class="detail"><span class="label">Name:</span> ${e.name}</div>
+        <div class="detail"><span class="label">Leiter:</span> ${e.leader}</div>
+        <div class="detail"><span class="label">Typ:</span> ${e.type}</div>
+        <div class="detail"><span class="label">Ort:</span> ${e.location}</div>
+        <div class="detail"><span class="label">Datum & Uhrzeit:</span> ${e.date}</div>
+        <div class="detail"><span class="label">Mikrofone:</span> ${e.mic}</div>
+        <div class="detail"><span class="label">Gesangs-Mikros:</span> ${e.vocals}</div>
+        <div class="detail"><span class="label">Rednerpult:</span> ${e.podium}</div>
+        <div class="detail"><span class="label">Beamer:</span> ${e.beamer}</div>
+        <div class="detail"><span class="label">Keyboards:</span> ${e.keyboard || 0}</div>
+        <div class="detail"><span class="label">Gitarren:</span> ${e.guitar || 0}</div>
+        <div class="detail"><span class="label">Skript:</span> ${e.script || "-"}</div>
+        <div class="detail"><span class="label">Kommentar:</span> ${e.comments || "-"}</div>
+    `;
+}
+
+loadDetails();
+</script>
+</body>
+</html>
