@@ -5,27 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Event Übersicht</title>
 <style>
-    body { font-family: Arial; margin:0; background:#f4f6f8; }
-    header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
-    header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
-    .container { max-width:900px; margin:auto; padding:20px; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { text-align:left; padding:8px; border-bottom:1px solid #ddd; }
-    th { background:#0f5f57; color:white; }
-    .actionBtn { padding:5px 10px; border:none; border-radius:4px; cursor:pointer; color:white; margin-right:5px; }
-    .edit { background:#4CAF50; }
-    .delete { background:#f44336; }
-    #toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
+body { font-family: Arial; margin:0; background:#f4f6f8; }
+header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
+header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
+.container { max-width:900px; margin:auto; padding:20px; }
+table { width:100%; border-collapse:collapse; }
+th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+th { background:#0f5f57; color:white; }
+button.action { padding:5px 10px; border:none; border-radius:4px; cursor:pointer; }
+#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
 </style>
 </head>
 <body>
-
 <header>
     <h2>Event Übersicht</h2>
-    <div>
-        <button onclick="window.location.href='newevent.html'">Neues Event</button>
-        <button onclick="window.location.href='calendar.html'">Kalender</button>
-    </div>
+    <button onclick="window.location.href='newevent.html'">Neues Event</button>
+    <button onclick="window.location.href='calendar.html'">Kalender</button>
 </header>
 
 <div class="container">
@@ -33,38 +28,26 @@
     <table>
         <thead>
             <tr>
-                <th>Datum</th>
                 <th>Name</th>
                 <th>Leiter</th>
                 <th>Typ</th>
                 <th>Ort</th>
+                <th>Datum</th>
+                <th>Uhrzeit</th>
                 <th>Aktionen</th>
             </tr>
         </thead>
-        <tbody id="eventTableBody">
-        </tbody>
+        <tbody id="eventTableBody"></tbody>
     </table>
 </div>
 
 <script type="module">
-import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-auth.js";
+import { db } from "./firebase-config.js";
 import { ref, get, remove } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
 
-// LOGIN SCHUTZ
-onAuthStateChanged(auth, user => {
-    if(!user) window.location.href="login.html";
-});
+const toast = document.getElementById("toast");
+function showToast(msg){ toast.textContent=msg; toast.style.display="block"; setTimeout(()=>{ toast.style.display="none"; },2000); }
 
-// TOAST
-function showToast(msg){
-    const t=document.getElementById("toast");
-    t.textContent=msg;
-    t.style.display="block";
-    setTimeout(()=>{t.style.display="none";},3000);
-}
-
-// EVENTS LADEN
 async function loadEvents(){
     const snapshot = await get(ref(db,"events"));
     const data = snapshot.exists()?snapshot.val():{};
@@ -74,31 +57,28 @@ async function loadEvents(){
         const e = data[id];
         const tr = document.createElement("tr");
         tr.innerHTML=`
-            <td>${e.date || '-'}</td>
-            <td>${e.name || '-'}</td>
-            <td>${e.leader || '-'}</td>
-            <td>${e.type || '-'}</td>
-            <td>${e.location || '-'}</td>
+            <td>${e.name}</td>
+            <td>${e.leader}</td>
+            <td>${e.type}</td>
+            <td>${e.location}</td>
+            <td>${e.date}</td>
+            <td>${e.time}</td>
             <td>
-                <button class="actionBtn edit" onclick="window.location.href='details.html?id=${id}'">Details</button>
-                <button class="actionBtn delete" onclick="deleteEvent('${id}')">Löschen</button>
+                <button class="action" onclick="window.location.href='details.html?id=${id}'">Details</button>
+                <button class="action" onclick="deleteEvent('${id}')">Löschen</button>
             </td>
         `;
         tbody.appendChild(tr);
     }
 }
-
-// EVENT LÖSCHEN
-async function deleteEvent(id){
-    if(!confirm("Event wirklich löschen?")) return;
-    await remove(ref(db,"events/"+id));
-    showToast("Event gelöscht!");
-    loadEvents();
+window.deleteEvent = async (id)=>{
+    if(confirm("Event wirklich löschen?")){
+        await remove(ref(db,"events/"+id));
+        showToast("Event gelöscht");
+        loadEvents();
+    }
 }
-
 loadEvents();
 </script>
-
 </body>
 </html>
-
