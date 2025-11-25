@@ -151,21 +151,8 @@ button.saveBtn:hover { background:#343541; }
 
 <script type="module">
 // Firebase import
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
-  authDomain: "event-plan-c4b36.firebaseapp.com",
-  databaseURL: "https://event-plan-c4b36-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "event-plan-c4b36",
-  storageBucket: "event-plan-c4b36.appspot.com",
-  messagingSenderId: "489710650124",
-  appId: "1:489710650124:web:6a515ffd6ec3d9983aff29"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+import { app, db } from './firebase.js';
+import { ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 // Login
 const loginBtn = document.getElementById('loginBtn');
@@ -274,6 +261,7 @@ window.editEvent = function(id){
             addEventForm.reset();
             addEventForm.style.display='none';
             showToast('Event aktualisiert!');
+            loadEvents();
             saveEventBtn.onclick = saveNewEvent;
         };
     });
@@ -300,6 +288,7 @@ function saveNewEvent(){
     addEventForm.reset();
     addEventForm.style.display='none';
     showToast('Event gespeichert!');
+    loadEvents();
 }
 
 const saveEventBtn = document.getElementById('saveEvent');
