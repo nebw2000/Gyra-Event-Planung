@@ -1,8 +1,8 @@
 // firebase.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, remove, set, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-// Firebase-Konfiguration
+// Firebase Konfiguration
 const firebaseConfig = {
   apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
   authDomain: "event-plan-c4b36.firebaseapp.com",
@@ -13,38 +13,42 @@ const firebaseConfig = {
   appId: "1:489710650124:web:6a515ffd6ec3d9983aff29"
 };
 
-// Firebase App initialisieren
-export const app = initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const eventsRef = ref(db, 'events');
 
-// Realtime Database
-export const db = getDatabase(app);
-
-// Funktion: Neues Event speichern
-export function saveEvent(eventData){
-    const eventsRef = ref(db, 'events');
-    push(eventsRef, eventData);
+// Event speichern
+export function saveEvent(data){
+    return push(eventsRef, data);
 }
 
-// Funktion: Event bearbeiten/aktualisieren
-export function updateEvent(id, eventData){
+// Event aktualisieren
+export function updateEvent(id, data){
     const eventRef = ref(db, 'events/' + id);
-    set(eventRef, eventData);
+    return update(eventRef, data);
 }
 
-// Funktion: Event löschen
+// Event löschen
 export function deleteEvent(id){
     const eventRef = ref(db, 'events/' + id);
-    remove(eventRef);
+    return remove(eventRef);
 }
 
-// Funktion: Alle Events laden und Callback aufrufen
+// Alle Events laden
 export function loadEvents(callback){
-    const eventsRef = ref(db, 'events');
     onValue(eventsRef, (snapshot)=>{
-        const events = [];
-        snapshot.forEach(childSnap=>{
-            events.push({id: childSnap.key, ...childSnap.val()});
+        const eventsObj = snapshot.val() || {};
+        const eventsArray = [];
+        for(let id in eventsObj){
+            eventsArray.push({id,...eventsObj[id]});
+        }
+        // Sortieren nach Datum und Uhrzeit
+        eventsArray.sort((a,b)=>{
+            const dateA = new Date(a.date + " " + a.time);
+            const dateB = new Date(b.date + " " + b.time);
+            return dateA - dateB;
         });
-        callback(events);
+        callback(eventsArray);
     });
 }
