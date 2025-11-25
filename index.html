@@ -3,250 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Event Planer</title>
+<title>Event Plan</title>
 <style>
-body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
-header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; border-radius:0 0 20px 20px; }
-header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:10px; cursor:pointer; font-weight:bold; }
-.container { max-width:900px; margin:auto; padding:20px; }
-.event-card { background:white; padding:15px; margin-bottom:10px; border-radius:15px; box-shadow:0 3px 6px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; }
-.event-info { flex:1; }
-button { padding:6px 10px; margin-left:5px; border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
-#toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 20px; color:white; border-radius:15px; display:none; z-index:1000; box-shadow:0 3px 6px rgba(0,0,0,0.2); font-weight:bold; }
-.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
-.modal-content { background:white; padding:25px; border-radius:15px; max-width:500px; width:90%; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
-label { display:block; margin-top:10px; font-weight:bold; }
-input, select, textarea { width:100%; padding:10px; margin-top:6px; border-radius:10px; border:1px solid #ccc; }
-button.save { background:#0f5f57; color:white; margin-top:15px; width:100%; }
-#loginContainer { display:flex; justify-content:center; align-items:center; height:100vh; }
-#loginBox { background:white; padding:30px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); max-width:400px; width:90%; }
-#loginBox h2 { text-align:center; margin-bottom:20px; color:#0f5f57; }
-#loginBox select, #loginBox input { margin-bottom:15px; }
-#loginBox button { background:#0f5f57; color:white; width:100%; padding:10px; font-weight:bold; border-radius:10px; border:none; cursor:pointer; }
+body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+.container { background:white; padding:30px; border-radius:12px; width:100%; max-width:500px; box-shadow:0 0 15px rgba(0,0,0,0.2); }
+h2 { margin-top:0; color:#0f5f57; text-align:center; }
+label { display:block; font-weight:bold; margin:10px 0 4px; }
+input, select { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-bottom:10px; }
+button { width:100%; padding:10px; border:none; border-radius:8px; background:#0f5f57; color:white; cursor:pointer; margin-top:5px; }
+#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
+.event-item { background:#e0f0f0; padding:10px; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.event-item span { flex:1; }
+.event-item button { margin-left:5px; }
 </style>
 </head>
 <body>
 
-<div id="loginContainer">
-  <div id="loginBox">
+<div class="container" id="login-container">
     <h2>Login</h2>
-    <label>Benutzer</label>
-    <select id="userType">
-      <option value="admin">Admin</option>
-      <option value="teacher">Lehrer*innen</option>
+    <label for="role">Rolle</label>
+    <select id="role">
+        <option value="admin">Admin</option>
+        <option value="teacher">Lehrer</option>
     </select>
-    <label>Passwort</label>
-    <input type="password" id="userPassword">
-    <button id="loginBtn">Einloggen</button>
-  </div>
+    <label for="password">Passwort</label>
+    <input id="password" type="password">
+    <button id="loginBtn">Login</button>
 </div>
 
-<div id="mainContent" style="display:none;">
-<header>
-<h2>Event Übersicht</h2>
-<button id="addEventBtn">Neues Event hinzufügen</button>
-</header>
+<div class="container" id="main-container" style="display:none;">
+    <h2>Event Übersicht</h2>
+    <div style="text-align:center; margin-bottom:10px;">
+        <button id="newEventBtn">Neues Event hinzufügen</button>
+    </div>
+    <div id="eventList"></div>
+    
+    <div id="newEventForm" style="display:none;">
+        <h2>Neues Event</h2>
+        <label>Name</label><input id="evName">
+        <label>Leiter</label><input id="evLeader">
+        <label>Typ</label>
+        <select id="evType">
+            <option>Probe</option><option>Konzert</option><option>Theater</option>
+            <option>Konferenz</option><option>Präsentation</option><option>Rede</option><option>Andere</option>
+        </select>
+        <label>Ort</label>
+        <select id="evLocation">
+            <option>Atrium</option><option>Forum</option>
+        </select>
+        <label>Datum</label><input id="evDate" type="date">
+        <label>Uhrzeit</label><input id="evTime" type="time">
+        <label>Microfone (Gesamt)</label>
+        <select id="evMic"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select>
+        <label>Gesangs-Microfone</label>
+        <select id="evVocals"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select>
+        <label>Rednerpult</label>
+        <select id="evPodium"><option>Ja</option><option>Nein</option></select>
+        <label>Beamer</label>
+        <select id="evBeamer"><option>Nein</option><option>Ja Bühne</option><option>Ja Wand</option><option>Ja beide</option></select>
+        <label>Keyboard</label><select id="evKeyboard"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select>
+        <label>Gitarren</label><select id="evGuitar"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select>
+        <label>Kommentar (optional)</label><input id="evComments">
+        <button id="saveEventBtn">Speichern</button>
+    </div>
+</div>
 
-<div class="container" id="eventsContainer"></div>
 <div id="toast"></div>
 
-<!-- Modal für Event erstellen/bearbeiten -->
-<div class="modal" id="eventModal">
-<div class="modal-content">
-<h3 id="modalTitle">Neues Event</h3>
-<label>Name</label>
-<input type="text" id="eventName">
-<label>Leiter</label>
-<input type="text" id="eventLeader">
-<label>Typ</label>
-<select id="eventType">
-<option>Probe</option><option>Konzert</option><option>Theater</option><option>Konferenz</option><option>Präsentation</option><option>Rede</option><option>Andere</option>
-</select>
-<label>Ort</label>
-<select id="eventLocation">
-<option>Atrium</option><option>Forum</option>
-</select>
-<label>Datum</label>
-<input type="date" id="eventDate">
-<label>Uhrzeit</label>
-<input type="time" id="eventTime">
-<label>Wie viele Mikrofone?</label>
-<select id="eventMic">
-<option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>mehr</option>
-</select>
-<label>Wie viele Gesangs-Mikros?</label>
-<select id="eventSingingMic">
-<option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>mehr</option>
-</select>
-<label>Rednerpult?</label>
-<select id="eventPodium">
-<option>Nein</option><option>Ja</option>
-</select>
-<label>Beamer</label>
-<select id="eventBeamer">
-<option>Nein</option><option>Ja Bühne</option><option>Ja Wand</option><option>Ja beide</option>
-</select>
-<label>Keyboards</label>
-<select id="eventKeyboard">
-<option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-</select>
-<label>Gitarren</label>
-<select id="eventGuitar">
-<option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-</select>
-<label>Kommentar</label>
-<textarea id="eventComment" rows="3"></textarea>
-<button class="save" id="saveEventBtn">Speichern</button>
-</div>
-</div>
-</div>
-
 <script type="module">
-import { saveEvent, updateEvent, deleteEvent, loadEvents } from './firebase.js';
+import { auth, db } from "./firebase-config.js";
+import { ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
 
-const loginContainer = document.getElementById("loginContainer");
-const mainContent = document.getElementById("mainContent");
-const loginBtn = document.getElementById("loginBtn");
-const userType = document.getElementById("userType");
-const userPassword = document.getElementById("userPassword");
-
-const eventsContainer = document.getElementById("eventsContainer");
+const loginContainer = document.getElementById("login-container");
+const mainContainer = document.getElementById("main-container");
 const toast = document.getElementById("toast");
-const modal = document.getElementById("eventModal");
-const modalTitle = document.getElementById("modalTitle");
-const addEventBtn = document.getElementById("addEventBtn");
+const roleField = document.getElementById("role");
+const passwordField = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const newEventBtn = document.getElementById("newEventBtn");
+const newEventForm = document.getElementById("newEventForm");
 const saveEventBtn = document.getElementById("saveEventBtn");
+const eventList = document.getElementById("eventList");
 
-// Eingabefelder
-const nameField = document.getElementById("eventName");
-const leaderField = document.getElementById("eventLeader");
-const typeField = document.getElementById("eventType");
-const locationField = document.getElementById("eventLocation");
-const dateField = document.getElementById("eventDate");
-const timeField = document.getElementById("eventTime");
-const micField = document.getElementById("eventMic");
-const singingMicField = document.getElementById("eventSingingMic");
-const podiumField = document.getElementById("eventPodium");
-const beamerField = document.getElementById("eventBeamer");
-const keyboardField = document.getElementById("eventKeyboard");
-const guitarField = document.getElementById("eventGuitar");
-const commentField = document.getElementById("eventComment");
+let currentRole = null;
+let editingId = null;
 
-let editEventId = null;
-
-// Login
-loginBtn.addEventListener("click", ()=>{
-    const type = userType.value;
-    const pass = userPassword.value;
-    if((type==="admin" && pass==="2309") || (type==="teacher" && pass==="event")){
-        loginContainer.style.display="none";
-        mainContent.style.display="block";
-        loadAllEvents();
-    } else{
-        alert("Falsches Passwort!");
-    }
-});
-
-// Toast
 function showToast(msg){
     toast.textContent = msg;
     toast.style.display="block";
     setTimeout(()=>{toast.style.display="none";},3000);
 }
 
-// Modal öffnen
-addEventBtn.addEventListener("click", ()=>{
-    modal.style.display="flex";
-    modalTitle.textContent="Neues Event";
-    editEventId=null;
-    nameField.value="";
-    leaderField.value="";
-    typeField.value="Probe";
-    locationField.value="Atrium";
-    dateField.value="";
-    timeField.value="";
-    micField.value="0";
-    singingMicField.value="0";
-    podiumField.value="Nein";
-    beamerField.value="Nein";
-    keyboardField.value="0";
-    guitarField.value="0";
-    commentField.value="";
+loginBtn.addEventListener("click", ()=>{
+    const role = roleField.value;
+    const pass = passwordField.value.trim();
+    if((role==="admin" && pass==="2309") || (role==="teacher" && pass==="event")){
+        currentRole = role;
+        loginContainer.style.display="none";
+        mainContainer.style.display="block";
+        loadEvents();
+    } else showToast("Falsches Passwort");
 });
 
-// Modal schließen, wenn Klick außerhalb
-window.addEventListener("click",(e)=>{if(e.target==modal) modal.style.display="none";});
+newEventBtn.addEventListener("click", ()=>{ newEventForm.style.display="block"; });
 
-// Event speichern
-saveEventBtn.addEventListener("click", ()=>{
-    const data = {
-        name:nameField.value,
-        leader:leaderField.value,
-        type:typeField.value,
-        location:locationField.value,
-        date:dateField.value,
-        time:timeField.value,
-        mic:micField.value,
-        singingMic:singingMicField.value,
-        podium:podiumField.value,
-        beamer:beamerField.value,
-        keyboard:keyboardField.value,
-        guitar:guitarField.value,
-        comment:commentField.value
-    };
-
-    if(!editEventId){
-        saveEvent(data).then(()=>{ 
-            showToast("Event gespeichert!"); 
-        });
-    } else{
-        updateEvent(editEventId,data).then(()=>{
-            showToast("Event aktualisiert!");
-        });
-    }
-    modal.style.display="none";
-});
-
-// Events laden und rendern
-function loadAllEvents(){
-    loadEvents((events)=>{
-        eventsContainer.innerHTML="";
-        events.forEach(ev=>{
-            const card = document.createElement("div");
-            card.className="event-card";
-            const info = document.createElement("div");
-            info.className="event-info";
-            info.innerHTML=`<strong>${ev.name}</strong> von ${ev.leader} <br> ${ev.type} am ${ev.date} ${ev.time}`;
-            const btnEdit = document.createElement("button");
-            btnEdit.textContent="Bearbeiten";
-            btnEdit.onclick=()=>{
-                editEventId=ev.id;
-                modal.style.display="flex";
-                modalTitle.textContent="Event bearbeiten";
-                nameField.value=ev.name;
-                leaderField.value=ev.leader;
-                typeField.value=ev.type;
-                locationField.value=ev.location;
-                dateField.value=ev.date;
-                timeField.value=ev.time;
-                micField.value=ev.mic;
-                singingMicField.value=ev.singingMic;
-                podiumField.value=ev.podium;
-                beamerField.value=ev.beamer;
-                keyboardField.value=ev.keyboard;
-                guitarField.value=ev.guitar;
-                commentField.value=ev.comment;
-            };
-            const btnDelete = document.createElement("button");
-            btnDelete.textContent="Löschen";
-            btnDelete.onclick=()=>{deleteEvent(ev.id).then(()=>{showToast("Event gelöscht!");});};
-            info.appendChild(btnEdit);
-            info.appendChild(btnDelete);
-            card.appendChild(info);
-            eventsContainer.appendChild(card);
-        });
+function loadEvents(){
+    eventList.innerHTML="";
+    const eventsRef = ref(db,"events");
+    onValue(eventsRef, snapshot=>{
+        eventList.innerHTML="";
+        const data = snapshot.val();
+        if(data){
+            Object.keys(data).forEach(id=>{
+                const e = data[id];
+                const div = document.createElement("div");
+                div.className="event-item";
+                div.innerHTML = `
+                    <span>${e.name} (${e.date} ${e.time})</span>
+                    <button class="viewBtn">Ansehen</button>
+                    <button class="editBtn">Bearbeiten</button>
+                    <button class="delBtn">Löschen</button>
+                `;
+                div.querySelector(".delBtn").onclick = ()=>{
+                    remove(ref(db,"events/"+id));
+                    showToast("Event gelöscht");
+                };
+                div.querySelector(".editBtn").onclick = ()=>{
+                    editingId = id;
+                    document.getElementById("evName").value=e.name;
+                    document.getElementById("evLeader").value=e.leader;
+                    document.getElementById("evType").value=e.type;
+                    document.getElementById("evLocation").value=e.location;
+                    document.getElementById("evDate").value=e.date;
+                    document.getElementById("evTime").value=e.time;
+                    document.getElementById("evMic").value=e.mic;
+                    document.getElementById("evVocals").value=e.vocals;
+                    document.getElementById("evPodium").value=e.podium;
+                    document.getElementById("evBeamer").value=e.beamer;
+                    document.getElementById("evKeyboard").value=e.keyboard;
+                    document.getElementById("evGuitar").value=e.guitar;
+                    document.getElementById("evComments").value=e.comments||"";
+                    newEventForm.style.display="block";
+                };
+                div.querySelector(".viewBtn").onclick = ()=>{
+                    const info = `
+Name: ${e.name}
+Leiter: ${e.leader}
+Typ: ${e.type}
+Ort: ${e.location}
+Datum: ${e.date} ${e.time}
+Microfone: ${e.mic}
+Gesangs-Microfone: ${e.vocals}
+Rednerpult: ${e.podium}
+Beamer: ${e.beamer}
+Keyboard: ${e.keyboard}
+Gitarren: ${e.guitar}
+Kommentar: ${e.comments||"-"}
+                    `;
+                    alert(info);
+                };
+                eventList.appendChild(div);
+            });
+        }
     });
 }
+
+saveEventBtn.addEventListener("click", ()=>{
+    const ev = {
+        name: document.getElementById("evName").value,
+        leader: document.getElementById("evLeader").value,
+        type: document.getElementById("evType").value,
+        location: document.getElementById("evLocation").value,
+        date: document.getElementById("evDate").value,
+        time: document.getElementById("evTime").value,
+        mic: document.getElementById("evMic").value,
+        vocals: document.getElementById("evVocals").value,
+        podium: document.getElementById("evPodium").value,
+        beamer: document.getElementById("evBeamer").value,
+        keyboard: document.getElementById("evKeyboard").value,
+        guitar: document.getElementById("evGuitar").value,
+        comments: document.getElementById("evComments").value
+    };
+    const key = editingId || Date.now();
+    set(ref(db,"events/"+key), ev).then(()=>{
+        showToast("Event gespeichert");
+        newEventForm.style.display="none";
+        editingId = null;
+    });
+});
 </script>
 </body>
 </html>
