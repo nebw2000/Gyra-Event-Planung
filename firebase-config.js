@@ -1,3 +1,4 @@
+// firebase-config.js
 export const firebaseConfig = {
   apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
   authDomain: "event-plan-c4b36.firebaseapp.com",
