@@ -1,9 +1,0 @@
-/ (Root)
-│
-├─ index.html
-├─ login.html
-├─ create.html
-├─ edit.html
-├─ calendar.html
-├─ firebase-config.js
-└─ (optional) assets/   --> für Bilder, CSS, Icons, etc.
