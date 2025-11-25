@@ -3,292 +3,234 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Event Manager</title>
+<title>Event Planer</title>
 <style>
 body { font-family: Arial; margin:0; background:#f4f6f8; }
 header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
+header h2 { margin:0; }
 header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
-.container { max-width:900px; margin:auto; padding:20px; }
+.container { max-width:1000px; margin:auto; padding:20px; }
+.event-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; }
+.card { background:white; padding:15px; border-radius:8px; box-shadow:0 0 5px rgba(0,0,0,0.1); position:relative; }
+.card h3 { margin:0 0 10px 0; color:#0f5f57; }
+.card button { margin-right:5px; padding:5px 8px; border:none; border-radius:6px; cursor:pointer; }
+#addEventForm { display:none; background:white; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2); margin-bottom:20px; }
+label { display:block; margin-top:10px; font-weight:bold; }
+input, select, textarea { width:100%; padding:6px; border-radius:6px; border:1px solid #ccc; margin-top:3px; }
+button.saveBtn { background:#0f5f57; color:white; margin-top:10px; width:100%; }
 #toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
-button.action { margin:2px; padding:4px 6px; border:none; border-radius:4px; cursor:pointer; }
-.event-card { background:white; padding:10px; border-radius:6px; margin-bottom:10px; box-shadow:0 0 5px rgba(0,0,0,0.1); }
-#addEventSection { background:white; padding:15px; border-radius:6px; margin-bottom:20px; display:none; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-label { display:block; font-weight:bold; margin:6px 0 2px; }
-input, select, textarea { width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; margin-bottom:8px; }
-button.saveBtn { background:#0f5f57; color:white; padding:8px; border:none; border-radius:6px; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<div id="toast"></div>
+<header>
+    <h2>Event Übersicht</h2>
+    <button id="addEventBtn">Event hinzufügen</button>
+</header>
 
-<!-- LOGIN -->
-<div id="loginSection" class="container">
-    <h2>Login</h2>
-    <label for="userType">Benutzer</label>
-    <select id="userType">
-        <option value="">Bitte wählen</option>
-        <option value="admin">Admin</option>
-        <option value="teacher">Lehrer*innen</option>
-    </select>
-    <label for="password">Passwort</label>
-    <input type="password" id="password">
-    <button id="loginBtn">Login</button>
-</div>
+<div class="container">
+    <div id="toast"></div>
 
-<!-- HAUPTSEITE -->
-<div id="mainSection" class="container" style="display:none;">
-    <header>
-        <h2>Event Übersicht</h2>
-        <button id="showAddEventBtn">Neues Event hinzufügen</button>
-        <button id="logoutBtn">Logout</button>
-    </header>
-
-    <div id="addEventSection">
+    <div id="addEventForm">
         <h3>Neues Event</h3>
-        <label for="eventName">Name</label>
-        <input id="eventName" type="text" required>
-        <label for="eventLeader">Leiter</label>
-        <input id="eventLeader" type="text" required>
-        <label for="eventType">Typ</label>
-        <select id="eventType">
-            <option value="Probe">Probe</option>
-            <option value="Konzert">Konzert</option>
-            <option value="Theater">Theater</option>
-            <option value="Konferenz">Konferenz</option>
-            <option value="Präsentation">Präsentation</option>
-            <option value="Rede">Rede</option>
-            <option value="Andere">Andere</option>
+        <label>Name</label>
+        <input id="name" type="text">
+        <label>Leiter</label>
+        <input id="leader" type="text">
+        <label>Typ</label>
+        <select id="type">
+            <option>Probe</option>
+            <option>Konzert</option>
+            <option>Theater</option>
+            <option>Konferenz</option>
+            <option>Präsentation</option>
+            <option>Rede</option>
+            <option>Andere</option>
         </select>
-        <label for="eventLocation">Ort</label>
-        <select id="eventLocation">
-            <option value="Atrium">Atrium</option>
-            <option value="Forum">Forum</option>
+        <label>Ort</label>
+        <select id="location">
+            <option>Atrium</option>
+            <option>Forum</option>
         </select>
-        <label for="micCount">Mikrofone</label>
-        <select id="micCount">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="mehr">Mehr</option>
+        <label>Mikros</label>
+        <select id="mic">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>mehr</option>
         </select>
-        <label for="vocMicCount">Gesangs-Mikrofone</label>
-        <select id="vocMicCount">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="mehr">Mehr</option>
+        <label>Gesangsmikros</label>
+        <select id="vocals">
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>mehr</option>
         </select>
-        <label for="podium">Rednerpult</label>
+        <label>Rednerpult</label>
         <select id="podium">
-            <option value="Nein">Nein</option>
-            <option value="Ja">Ja</option>
+            <option>Ja</option>
+            <option>Nein</option>
         </select>
-        <label for="beamer">Beamer</label>
+        <label>Beamer</label>
         <select id="beamer">
-            <option value="Nein">Nein</option>
-            <option value="Ja Bühne">Ja Bühne</option>
-            <option value="Ja Wand">Ja Wand</option>
-            <option value="Ja beide">Ja beide</option>
+            <option>Ja Bühne</option>
+            <option>Ja Wand</option>
+            <option>Ja beide</option>
+            <option>Nein</option>
         </select>
-        <label for="keyboardCount">Keyboards</label>
-        <select id="keyboardCount">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+        <label>Keyboards</label>
+        <select id="keyboard">
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
         </select>
-        <label for="guitarCount">Gitarren</label>
-        <select id="guitarCount">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+        <label>Gitarren</label>
+        <select id="guitar">
+            <option>0</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
         </select>
-        <label for="eventDate">Datum</label>
-        <input type="date" id="eventDate">
-        <label for="eventTime">Uhrzeit</label>
-        <input type="time" id="eventTime">
-        <label for="eventComments">Kommentar (optional)</label>
-        <textarea id="eventComments"></textarea>
-        <button class="saveBtn" id="saveEventBtn">Speichern</button>
+        <label>Kommentar (optional)</label>
+        <textarea id="comments"></textarea>
+        <label>Datum & Uhrzeit</label>
+        <input type="datetime-local" id="eventDate">
+
+        <button class="saveBtn" id="saveEvent">Speichern</button>
     </div>
 
-    <h3>Alle Events</h3>
-    <div id="eventsContainer"></div>
+    <div class="event-list" id="eventsContainer"></div>
 </div>
 
 <script type="module">
-// Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
-import { getDatabase, ref, set, get, remove, update } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
+import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
 
+// Firebase-Konfiguration
 const firebaseConfig = {
   apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
   authDomain: "event-plan-c4b36.firebaseapp.com",
   databaseURL: "https://event-plan-c4b36-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "event-plan-c4b36",
-  storageBucket: "event-plan-c4b36.appspot.com",
+  storageBucket: "event-plan-c4b36.firebasestorage.app",
   messagingSenderId: "489710650124",
-  appId: "1:489710650124:web:05423665acc223a83aff29"
+  appId: "1:489710650124:web:6a515ffd6ec3d9983aff29",
+  measurementId: "G-CPW8C0JVZX"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// TOAST
 const toast = document.getElementById("toast");
 function showToast(msg){
     toast.textContent = msg;
     toast.style.display="block";
-    setTimeout(()=>{toast.style.display="none";},3000);
+    setTimeout(()=>{ toast.style.display="none"; },3000);
 }
 
-// LOGIN
-const loginSection = document.getElementById("loginSection");
-const mainSection = document.getElementById("mainSection");
-const loginBtn = document.getElementById("loginBtn");
-const userTypeField = document.getElementById("userType");
-const passwordField = document.getElementById("password");
+const addEventBtn = document.getElementById("addEventBtn");
+const addEventForm = document.getElementById("addEventForm");
+addEventBtn.addEventListener("click", ()=>{ addEventForm.style.display="block"; });
 
-loginBtn.addEventListener("click", ()=>{
-    const userType = userTypeField.value;
-    const pass = passwordField.value;
-    if((userType=="admin" && pass=="2309") || (userType=="teacher" && pass=="event")){
-        loginSection.style.display="none";
-        mainSection.style.display="block";
-        loadEvents();
-    } else {
-        showToast("Falscher Benutzer oder Passwort");
-    }
-});
-
-document.getElementById("logoutBtn").addEventListener("click", ()=>{
-    mainSection.style.display="none";
-    loginSection.style.display="block";
-});
-
-// EVENTS
-const addEventSection = document.getElementById("addEventSection");
-document.getElementById("showAddEventBtn").addEventListener("click", ()=>{
-    addEventSection.style.display = addEventSection.style.display=="none"?"block":"none";
-});
-
-// SAVE EVENT
-document.getElementById("saveEventBtn").addEventListener("click", async ()=>{
-    const id = Date.now(); // einfache ID
-    const eventData = {
-        name: document.getElementById("eventName").value,
-        leader: document.getElementById("eventLeader").value,
-        type: document.getElementById("eventType").value,
-        location: document.getElementById("eventLocation").value,
-        mic: document.getElementById("micCount").value,
-        vocMic: document.getElementById("vocMicCount").value,
+const saveBtn = document.getElementById("saveEvent");
+saveBtn.addEventListener("click", async ()=>{
+    const eventId = Date.now();
+    const updated = {
+        name: document.getElementById("name").value,
+        leader: document.getElementById("leader").value,
+        type: document.getElementById("type").value,
+        location: document.getElementById("location").value,
+        mic: document.getElementById("mic").value,
+        vocals: document.getElementById("vocals").value,
         podium: document.getElementById("podium").value,
         beamer: document.getElementById("beamer").value,
-        keyboard: document.getElementById("keyboardCount").value,
-        guitar: document.getElementById("guitarCount").value,
-        date: document.getElementById("eventDate").value,
-        time: document.getElementById("eventTime").value,
-        comments: document.getElementById("eventComments").value
+        keyboard: document.getElementById("keyboard").value,
+        guitar: document.getElementById("guitar").value,
+        comments: document.getElementById("comments").value || "",
+        date: document.getElementById("eventDate").value
     };
-    await set(ref(db,"events/"+id), eventData);
-    showToast("Event gespeichert!");
-    addEventSection.style.display="none";
-    loadEvents();
+    await set(ref(db,"events/"+eventId), updated);
+    showToast("Event erfolgreich gespeichert!");
+    addEventForm.reset();
+    addEventForm.style.display="none";
 });
 
-// LOAD EVENTS
-async function loadEvents(){
-    const container = document.getElementById("eventsContainer");
-    container.innerHTML="";
-    const snapshot = await get(ref(db,"events"));
-    const data = snapshot.exists()?snapshot.val():{};
-    for(const id in data){
-        const ev = data[id];
-        const div = document.createElement("div");
-        div.className="event-card";
-        div.innerHTML = `
-            <b>${ev.name}</b> - ${ev.leader} <br>
-            Typ: ${ev.type}, Ort: ${ev.location} <br>
-            Mikrofone: ${ev.mic}, Gesangs-Mic: ${ev.vocMic} <br>
-            Rednerpult: ${ev.podium}, Beamer: ${ev.beamer} <br>
-            Keyboards: ${ev.keyboard}, Gitarren: ${ev.guitar} <br>
-            Datum: ${ev.date}, Zeit: ${ev.time} <br>
-            Kommentar: ${ev.comments} <br>
-            <button class="action" onclick="editEvent('${id}')">Bearbeiten</button>
-            <button class="action" onclick="deleteEvent('${id}')">Löschen</button>
+// Events live laden
+const eventsContainer = document.getElementById("eventsContainer");
+const eventsRef = ref(db,"events");
+onValue(eventsRef, snapshot=>{
+    eventsContainer.innerHTML="";
+    snapshot.forEach(child=>{
+        const e = child.val();
+        const id = child.key;
+        const card = document.createElement("div");
+        card.className="card";
+        card.innerHTML = `
+            <h3>${e.name}</h3>
+            <p><b>Leiter:</b> ${e.leader}</p>
+            <p><b>Typ:</b> ${e.type}</p>
+            <p><b>Ort:</b> ${e.location}</p>
+            <p><b>Mikros:</b> ${e.mic}, Gesang: ${e.vocals}</p>
+            <p><b>Rednerpult:</b> ${e.podium}</p>
+            <p><b>Beamer:</b> ${e.beamer}</p>
+            <p><b>Keyboards:</b> ${e.keyboard}, Gitarren: ${e.guitar}</p>
+            <p><b>Datum:</b> ${e.date}</p>
+            <p><b>Kommentar:</b> ${e.comments}</p>
+            <button class="editBtn">Bearbeiten</button>
+            <button class="deleteBtn">Löschen</button>
         `;
-        container.appendChild(div);
-    }
-}
+        const editBtn = card.querySelector(".editBtn");
+        editBtn.addEventListener("click", ()=>{
+            addEventForm.style.display="block";
+            document.getElementById("name").value=e.name;
+            document.getElementById("leader").value=e.leader;
+            document.getElementById("type").value=e.type;
+            document.getElementById("location").value=e.location;
+            document.getElementById("mic").value=e.mic;
+            document.getElementById("vocals").value=e.vocals;
+            document.getElementById("podium").value=e.podium;
+            document.getElementById("beamer").value=e.beamer;
+            document.getElementById("keyboard").value=e.keyboard;
+            document.getElementById("guitar").value=e.guitar;
+            document.getElementById("comments").value=e.comments;
+            document.getElementById("eventDate").value=e.date;
+            saveBtn.onclick = async ()=>{
+                await set(ref(db,"events/"+id), {
+                    name: document.getElementById("name").value,
+                    leader: document.getElementById("leader").value,
+                    type: document.getElementById("type").value,
+                    location: document.getElementById("location").value,
+                    mic: document.getElementById("mic").value,
+                    vocals: document.getElementById("vocals").value,
+                    podium: document.getElementById("podium").value,
+                    beamer: document.getElementById("beamer").value,
+                    keyboard: document.getElementById("keyboard").value,
+                    guitar: document.getElementById("guitar").value,
+                    comments: document.getElementById("comments").value || "",
+                    date: document.getElementById("eventDate").value
+                });
+                showToast("Event erfolgreich bearbeitet!");
+                addEventForm.reset();
+                addEventForm.style.display="none";
+            }
+        });
 
-// DELETE
-window.deleteEvent = async function(id){
-    if(confirm("Event wirklich löschen?")){
-        await remove(ref(db,"events/"+id));
-        showToast("Event gelöscht!");
-        loadEvents();
-    }
-}
+        const deleteBtn = card.querySelector(".deleteBtn");
+        deleteBtn.addEventListener("click", ()=>{ remove(ref(db,"events/"+id)); });
 
-// EDIT
-window.editEvent = function(id){
-    get(ref(db,"events/"+id)).then(snapshot=>{
-        const ev = snapshot.val();
-        if(!ev) return;
-        addEventSection.style.display="block";
-        document.getElementById("eventName").value = ev.name;
-        document.getElementById("eventLeader").value = ev.leader;
-        document.getElementById("eventType").value = ev.type;
-        document.getElementById("eventLocation").value = ev.location;
-        document.getElementById("micCount").value = ev.mic;
-        document.getElementById("vocMicCount").value = ev.vocMic;
-        document.getElementById("podium").value = ev.podium;
-        document.getElementById("beamer").value = ev.beamer;
-        document.getElementById("keyboardCount").value = ev.keyboard;
-        document.getElementById("guitarCount").value = ev.guitar;
-        document.getElementById("eventDate").value = ev.date;
-        document.getElementById("eventTime").value = ev.time;
-        document.getElementById("eventComments").value = ev.comments;
-        document.getElementById("saveEventBtn").onclick = async ()=>{
-            await update(ref(db,"events/"+id), {
-                name: document.getElementById("eventName").value,
-                leader: document.getElementById("eventLeader").value,
-                type: document.getElementById("eventType").value,
-                location: document.getElementById("eventLocation").value,
-                mic: document.getElementById("micCount").value,
-                vocMic: document.getElementById("vocMicCount").value,
-                podium: document.getElementById("podium").value,
-                beamer: document.getElementById("beamer").value,
-                keyboard: document.getElementById("keyboardCount").value,
-                guitar: document.getElementById("guitarCount").value,
-                date: document.getElementById("eventDate").value,
-                time: document.getElementById("eventTime").value,
-                comments: document.getElementById("eventComments").value
-            });
-            showToast("Event aktualisiert!");
-            addEventSection.style.display="none";
-            document.getElementById("saveEventBtn").onclick = saveNewEvent;
-            loadEvents();
-        };
+        eventsContainer.appendChild(card);
     });
-}
-
-// Reset save button for new event
-function saveNewEvent(){
-    document.getElementById("saveEventBtn").click();
-}
+});
 </script>
 </body>
 </html>
