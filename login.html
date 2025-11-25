@@ -15,36 +15,38 @@ button { width:100%; padding:10px; margin-top:15px; border:none; border-radius:6
 </style>
 </head>
 <body>
-
 <div class="container">
     <div id="toast"></div>
     <h2>Login</h2>
-
-    <label for="userType">Benutzer</label>
-    <select id="userType">
-        <option value="">-- Bitte wählen --</option>
+    <label for="role">Benutzer</label>
+    <select id="role">
         <option value="admin">Admin</option>
         <option value="teacher">Lehrer*innen</option>
     </select>
-
     <label for="password">Passwort</label>
     <input id="password" type="password" required>
-
     <button id="loginBtn">Login</button>
 </div>
 
-<script>
+<script type="module">
+import { auth } from "./firebase-config.js";
+
+const btn = document.getElementById("loginBtn");
+const role = document.getElementById("role");
+const passwordField = document.getElementById("password");
 const toast = document.getElementById("toast");
-function showToast(msg){ toast.textContent=msg; toast.style.display="block"; setTimeout(()=>{toast.style.display="none";},3000); }
 
-document.getElementById("loginBtn").addEventListener("click", ()=>{
-    const type = document.getElementById("userType").value;
-    const pwd = document.getElementById("password").value.trim();
+function showToast(msg){
+    toast.textContent = msg;
+    toast.style.display="block";
+    setTimeout(()=>{toast.style.display="none";},3000);
+}
 
-    if(!type || !pwd){ showToast("Bitte Benutzer und Passwort wählen"); return; }
-
-    if((type==="admin" && pwd==="2309") || (type==="teacher" && pwd==="event")){
-        localStorage.setItem("userType", type); // Merken wer eingeloggt ist
+btn.addEventListener("click", ()=> {
+    const selected = role.value;
+    const password = passwordField.value.trim();
+    if((selected==="admin" && password==="2309") || (selected==="teacher" && password==="event")){
+        localStorage.setItem("userRole", selected);
         window.location.href="index.html";
     } else {
         showToast("Falsches Passwort");
