@@ -1,251 +1,230 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Event Verwaltung</title>
+    <meta charset="UTF-8">
+    <title>Event System</title>
 
-<style>
-    body {
-        margin: 0;
-        background: #0077b6;
-        font-family: Arial, sans-serif;
-    }
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #001a33, #004080);
+            font-family: Arial;
+            color: black;
+        }
 
-    .view {
-        display: none;
-    }
+        .center {
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+            margin: 60px auto;
+            background: white;
+            border-radius: 18px;
+            border: 2px solid black;
+        }
 
-    header {
-        background: white;
-        padding: 15px;
-        border-bottom: 2px solid black;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 2px solid black;
+            border-radius: 8px;
+            background: white;
+            color: black;
+        }
 
-    button {
-        background: #d9d9d9;
-        border: 1px solid black;
-        color: black;
-        padding: 10px 14px;
-        border-radius: 6px;
-        cursor: pointer;
-    }
+        button {
+            padding: 12px 18px;
+            background: #d9d9d9;
+            color: black;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
 
-    button:hover {
-        background: #c9c9c9;
-    }
+        .event-card {
+            background: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 15px;
+        }
 
-    input, select, textarea {
-        width: 100%;
-        padding: 10px;
-        background: white;
-        border: 1px solid black;
-        border-radius: 4px;
-        color: black;
-        margin-bottom: 12px;
-        box-sizing: border-box;
-    }
+        #toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            color: black;
+            border: 2px solid black;
+            padding: 10px 16px;
+            border-radius: 8px;
+            display: none;
+        }
 
-    table {
-        width: 100%;
-        background: white;
-        border-collapse: collapse;
-    }
-
-    th, td {
-        border: 1px solid black;
-        padding: 10px;
-    }
-
-    #toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        padding: 12px 18px;
-        border: 1px solid black;
-        border-radius: 6px;
-        color: black;
-        display: none;
-    }
-
-    /* Login */
-    #loginBox {
-        width: 320px;
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        border: 1px solid black;
-        margin: 80px auto;
-    }
-
-</style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
 
-<div id="toast"></div>
+<!-- TOAST -->
+<div id="toast">Gespeichert</div>
 
 <!-- LOGIN -->
-<div id="loginView" class="view" style="display:block;">
-    <div id="loginBox">
-        <h3>Login</h3>
-        <input id="loginUser" placeholder="Benutzer">
-        <input id="loginPass" placeholder="Passwort" type="password">
-        <button onclick="login()">Login</button>
-    </div>
+<div id="loginBox" class="center">
+    <h2>Login</h2>
+    <input id="loginUser" placeholder="Benutzer">
+    <input id="loginPass" type="password" placeholder="Passwort">
+    <button onclick="login()">Einloggen</button>
 </div>
 
 <!-- ÜBERSICHT -->
-<div id="homeView" class="view">
-    <header>
-        <h2>Event Übersicht</h2>
-        <div>
-            <button onclick="switchView('createView')">Neues Event</button>
-            <button onclick="logout()">Logout</button>
-        </div>
-    </header>
+<div id="mainBox" class="center hidden">
+    <h2>Event Übersicht</h2>
 
-    <div style="padding:20px;">
-        <table>
-            <thead>
-                <tr>
-                    <th>Datum</th>
-                    <th>Name</th>
-                    <th>Leiter</th>
-                    <th>Rednerpult</th>
-                </tr>
-            </thead>
-            <tbody id="eventTable"></tbody>
-        </table>
-    </div>
+    <button onclick="openAdd()">Event hinzufügen</button>
+
+    <div id="eventList"></div>
 </div>
 
-<!-- EVENT ANLEGEN -->
-<div id="createView" class="view">
-    <header>
-        <h2>Neues Event</h2>
-        <button onclick="switchView('homeView')">Zurück</button>
-    </header>
+<!-- EVENT HINZUFÜGEN -->
+<div id="addBox" class="center hidden">
+    <h2>Neues Event</h2>
 
-    <div style="padding:20px;">
-        <input id="eventName" placeholder="Name">
-        <input id="eventLeader" placeholder="Leiter">
-        <input id="eventDate" type="date">
+    <input id="eventName" placeholder="Name">
+    <input id="eventDate" type="date">
+    <input id="eventLeader" placeholder="Leiter">
+    
+    <label>Rednerpult?</label>
+    <select id="eventPult">
+        <option>Ja</option>
+        <option>Nein</option>
+    </select>
 
-        <label>Rednerpult</label>
-        <select id="eventPult">
-            <option value="Ja">Ja</option>
-            <option value="Nein">Nein</option>
-        </select>
+    <textarea id="eventDescr" placeholder="Beschreibung"></textarea>
 
-        <button onclick="saveEvent()">Speichern</button>
-    </div>
+    <button onclick="saveEvent()">Speichern</button>
+    <button onclick="backToMain()">Zurück</button>
 </div>
+
 
 <script type="module">
-import { db, auth } from "./firebase-config.js";
-import { 
-    set, 
-    ref, 
-    push, 
-    onValue 
-} from "./firebase.js";
 
-/* VIEWS */
-function switchView(id) {
-    document.querySelectorAll(".view").forEach(v => v.style.display = "none");
-    document.getElementById(id).style.display = "block";
-}
+/* Firebase einbinden */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, push, set, onValue } 
+    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
+  authDomain: "event-plan-c4b36.firebaseapp.com",
+  databaseURL: "https://event-plan-c4b36-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "event-plan-c4b36",
+  storageBucket: "event-plan-c4b36.firebasestorage.app",
+  messagingSenderId: "489710650124",
+  appId: "1:489710650124:web:6a515ffd6ec3d9983aff29"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 /* LOGIN */
 function login() {
-    const u = loginUser.value.trim();
-    const p = loginPass.value.trim();
+    const u = loginUser.value;
+    const p = loginPass.value;
 
-    if ((u === "lehrer" && p === "event") ||
+    if ((u === "lehrerin" && p === "event") ||
         (u === "admin" && p === "2309") ||
-        (u === "gast" && p === "1234")) {
+        (u === "user" && p === "1234")) {
 
-        switchView("homeView");
-        loadEvents();
-        return;
+        loginBox.classList.add("hidden");
+        mainBox.classList.remove("hidden");
+
     }
-
-    showToast("Login falsch");
 }
 
-window.login = login;
-
-/* LOGOUT */
-function logout() {
-    switchView("loginView");
+/* ZUM HINZUFÜGEN */
+function openAdd() {
+    mainBox.classList.add("hidden");
+    addBox.classList.remove("hidden");
 }
-window.logout = logout;
 
-/* SAVE EVENT */
+/* ZURÜCK */
+function backToMain() {
+    addBox.classList.add("hidden");
+    mainBox.classList.remove("hidden");
+}
+
+/* SPEICHERN */
 function saveEvent() {
     const name = eventName.value.trim();
-    const leader = eventLeader.value.trim();
     const date = eventDate.value;
+    const leader = eventLeader.value.trim();
     const pult = eventPult.value;
+    const descr = eventDescr.value.trim();
 
-    if (!name || !leader || !date) {
-        showToast("Felder ausfüllen");
-        return;
-    }
+    if (!name || !date) return;
 
-    const path = ref(db, "events");
-    const newRef = push(path);
-
+    const newRef = push(ref(db, "events"));
     set(newRef, {
-        name, leader, date, pult
-    }).then(() => {
-        showToast("Gespeichert");
-        setTimeout(() => {
-            switchView("homeView");
-        }, 3000);
+        name,
+        date,
+        leader,
+        pult,
+        descr
     });
-}
-window.saveEvent = saveEvent;
 
-/* LOAD EVENTS */
-function loadEvents() {
-    const path = ref(db, "events");
-    onValue(path, snap => {
-        const table = document.getElementById("eventTable");
-        table.innerHTML = "";
-
-        const data = snap.val();
-        if (!data) return;
-
-        const arr = Object.values(data);
-        arr.sort((a,b) => a.date.localeCompare(b.date));
-
-        arr.forEach(e => {
-            table.innerHTML += `
-                <tr>
-                    <td>${e.date}</td>
-                    <td>${e.name}</td>
-                    <td>${e.leader}</td>
-                    <td>${e.pult}</td>
-                </tr>
-            `;
-        });
-    });
+    showToast();
+    backToMain();
 }
 
 /* TOAST */
-function showToast(msg) {
+function showToast() {
     const t = document.getElementById("toast");
-    t.innerText = msg;
     t.style.display = "block";
     setTimeout(() => t.style.display = "none", 3000);
 }
 
+/* LADEN */
+function loadEvents() {
+    const eventsRef = ref(db, "events");
+
+    onValue(eventsRef, snap => {
+        const list = document.getElementById("eventList");
+        list.innerHTML = "";
+
+        const data = snap.val();
+        if (!data) return;
+
+        const items = Object.entries(data)
+            .sort((a, b) => new Date(a[1].date) - new Date(b[1].date));
+
+        items.forEach(([id, ev]) => {
+            const card = document.createElement("div");
+            card.className = "event-card";
+
+            card.innerHTML = `
+                <b>${ev.name}</b><br>
+                ${ev.date}<br>
+                Leiter: ${ev.leader}<br>
+                Rednerpult: ${ev.pult}<br><br>
+                <button onclick="deleteEvent('${id}')">Löschen</button>
+            `;
+
+            list.appendChild(card);
+        });
+    });
+}
+
+window.deleteEvent = function(id) {
+    set(ref(db, "events/" + id), null);
+};
+
+loadEvents();
 </script>
 
 </body>
