@@ -5,16 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Event Plan</title>
 <style>
-body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:center; min-height:100vh; }
-.container { background:white; padding:30px; border-radius:12px; width:100%; max-width:500px; box-shadow:0 0 15px rgba(0,0,0,0.2); }
+body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:20px;}
+.container { background:white; padding:30px; border-radius:12px; width:100%; max-width:700px; box-shadow:0 4px 15px rgba(0,0,0,0.2); margin-bottom:50px;}
 h2 { margin-top:0; color:#0f5f57; text-align:center; }
 label { display:block; font-weight:bold; margin:10px 0 4px; }
-input, select { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-bottom:10px; }
-button { width:100%; padding:10px; border:none; border-radius:8px; background:#0f5f57; color:white; cursor:pointer; margin-top:5px; }
-#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
-.event-item { background:#e0f0f0; padding:10px; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
-.event-item span { flex:1; }
-.event-item button { margin-left:5px; }
+input, select { width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; box-sizing:border-box;}
+button { padding:10px; border:none; border-radius:8px; background:#0f5f57; color:white; cursor:pointer; margin-top:5px; transition:0.2s; }
+button:hover { background:#0d4b47; }
+#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; z-index:999; }
+.event-card { background:#e0f0f0; padding:15px; border-radius:10px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+.event-card span { flex:1 1 60%; font-weight:bold; }
+.event-card .buttons { flex:1 1 35%; display:flex; justify-content:flex-end; gap:5px; flex-wrap:wrap;}
+#searchBar { margin-bottom:15px; padding:10px; border-radius:8px; border:1px solid #ccc; width:100%; box-sizing:border-box; }
+#newEventForm { margin-top:20px; background:#f0f5f7; padding:20px; border-radius:12px; }
 </style>
 </head>
 <body>
@@ -33,6 +36,7 @@ button { width:100%; padding:10px; border:none; border-radius:8px; background:#0
 
 <div class="container" id="main-container" style="display:none;">
     <h2>Event Übersicht</h2>
+    <input id="searchBar" placeholder="Nach Name oder Leiter suchen...">
     <div style="text-align:center; margin-bottom:10px;">
         <button id="newEventBtn">Neues Event hinzufügen</button>
     </div>
@@ -84,9 +88,11 @@ const newEventBtn = document.getElementById("newEventBtn");
 const newEventForm = document.getElementById("newEventForm");
 const saveEventBtn = document.getElementById("saveEventBtn");
 const eventList = document.getElementById("eventList");
+const searchBar = document.getElementById("searchBar");
 
 let currentRole = null;
 let editingId = null;
+let eventsData = {};
 
 function showToast(msg){
     toast.textContent = msg;
@@ -108,45 +114,57 @@ loginBtn.addEventListener("click", ()=>{
 newEventBtn.addEventListener("click", ()=>{ newEventForm.style.display="block"; });
 
 function loadEvents(){
-    eventList.innerHTML="";
     const eventsRef = ref(db,"events");
     onValue(eventsRef, snapshot=>{
-        eventList.innerHTML="";
         const data = snapshot.val();
-        if(data){
-            Object.keys(data).forEach(id=>{
-                const e = data[id];
-                const div = document.createElement("div");
-                div.className="event-item";
-                div.innerHTML = `
-                    <span>${e.name} (${e.date} ${e.time})</span>
-                    <button class="viewBtn">Ansehen</button>
-                    <button class="editBtn">Bearbeiten</button>
-                    <button class="delBtn">Löschen</button>
-                `;
-                div.querySelector(".delBtn").onclick = ()=>{
-                    remove(ref(db,"events/"+id));
-                    showToast("Event gelöscht");
-                };
-                div.querySelector(".editBtn").onclick = ()=>{
-                    editingId = id;
-                    document.getElementById("evName").value=e.name;
-                    document.getElementById("evLeader").value=e.leader;
-                    document.getElementById("evType").value=e.type;
-                    document.getElementById("evLocation").value=e.location;
-                    document.getElementById("evDate").value=e.date;
-                    document.getElementById("evTime").value=e.time;
-                    document.getElementById("evMic").value=e.mic;
-                    document.getElementById("evVocals").value=e.vocals;
-                    document.getElementById("evPodium").value=e.podium;
-                    document.getElementById("evBeamer").value=e.beamer;
-                    document.getElementById("evKeyboard").value=e.keyboard;
-                    document.getElementById("evGuitar").value=e.guitar;
-                    document.getElementById("evComments").value=e.comments||"";
-                    newEventForm.style.display="block";
-                };
-                div.querySelector(".viewBtn").onclick = ()=>{
-                    const info = `
+        eventsData = data || {};
+        displayEvents();
+    });
+}
+
+function displayEvents(filter=""){
+    eventList.innerHTML="";
+    let entries = Object.entries(eventsData);
+    entries.sort((a,b)=>{
+        const da = new Date(a[1].date + " " + a[1].time);
+        const db_ = new Date(b[1].date + " " + b[1].time);
+        return da-db_;
+    });
+    entries.forEach(([id,e])=>{
+        if(filter && !e.name.toLowerCase().includes(filter.toLowerCase()) && !e.leader.toLowerCase().includes(filter.toLowerCase())) return;
+        const div = document.createElement("div");
+        div.className="event-card";
+        div.innerHTML = `
+            <span>${e.name} (${e.date} ${e.time})</span>
+            <div class="buttons">
+                <button class="viewBtn">Ansehen</button>
+                <button class="editBtn">Bearbeiten</button>
+                <button class="delBtn">Löschen</button>
+            </div>
+        `;
+        div.querySelector(".delBtn").onclick = ()=>{
+            remove(ref(db,"events/"+id));
+            showToast("Event gelöscht");
+        };
+        div.querySelector(".editBtn").onclick = ()=>{
+            editingId = id;
+            document.getElementById("evName").value=e.name;
+            document.getElementById("evLeader").value=e.leader;
+            document.getElementById("evType").value=e.type;
+            document.getElementById("evLocation").value=e.location;
+            document.getElementById("evDate").value=e.date;
+            document.getElementById("evTime").value=e.time;
+            document.getElementById("evMic").value=e.mic;
+            document.getElementById("evVocals").value=e.vocals;
+            document.getElementById("evPodium").value=e.podium;
+            document.getElementById("evBeamer").value=e.beamer;
+            document.getElementById("evKeyboard").value=e.keyboard;
+            document.getElementById("evGuitar").value=e.guitar;
+            document.getElementById("evComments").value=e.comments||"";
+            newEventForm.style.display="block";
+        };
+        div.querySelector(".viewBtn").onclick = ()=>{
+            const info = `
 Name: ${e.name}
 Leiter: ${e.leader}
 Typ: ${e.type}
@@ -159,14 +177,16 @@ Beamer: ${e.beamer}
 Keyboard: ${e.keyboard}
 Gitarren: ${e.guitar}
 Kommentar: ${e.comments||"-"}
-                    `;
-                    alert(info);
-                };
-                eventList.appendChild(div);
-            });
-        }
+            `;
+            alert(info);
+        };
+        eventList.appendChild(div);
     });
 }
+
+searchBar.addEventListener("input",(e)=>{
+    displayEvents(e.target.value);
+});
 
 saveEventBtn.addEventListener("click", ()=>{
     const ev = {
@@ -189,6 +209,7 @@ saveEventBtn.addEventListener("click", ()=>{
         showToast("Event gespeichert");
         newEventForm.style.display="none";
         editingId = null;
+        displayEvents(); // direkt aktualisieren
     });
 });
 </script>
