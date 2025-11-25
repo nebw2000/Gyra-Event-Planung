@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Übersicht</title>
+<style>
+body { font-family: Arial; margin:0; background:#f4f6f8; }
+header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
+header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
+.container { max-width:900px; margin:auto; padding:20px; }
+table { width:100%; border-collapse:collapse; }
+th, td { padding:8px; border-bottom:1px solid #ccc; text-align:left; }
+button.actionBtn { padding:5px 10px; border:none; border-radius:4px; cursor:pointer; margin-right:4px; }
+button.edit { background:#4CAF50; color:white; }
+button.delete { background:#f44336; color:white; }
+#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
+</style>
+</head>
+<body>
+<header>
+    <h2>Event Übersicht</h2>
+    <div>
+        <button onclick="window.location.href='new_event.html'">Neues Event</button>
+        <button onclick="window.location.href='calendar.html'">Kalender</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<div class="container">
+    <div id="toast"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Name</th>
+                <th>Leiter</th>
+                <th>Typ</th>
+                <th>Ort</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+        <tbody id="eventTableBody"></tbody>
+    </table>
+</div>
+
+<script type="module">
+import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
+  authDomain: "event-plan-c4b36.firebaseapp.com",
+  databaseURL: "https://event-plan-c4b36-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "event-plan-c4b36",
+  storageBucket: "event-plan-c4b36.appspot.com",
+  messagingSenderId: "489710650124",
+  appId: "1:489710650124:web:05423665acc223a83aff29",
+  measurementId: "G-KRY2MM4JEV"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+if(!localStorage.getItem("userType")) window.location.href="login.html";
+
+const tbody = document.getElementById("eventTableBody");
+const toast = document.getElementById("toast");
+function showToast(msg){ toast.textContent=msg; toast.style.display="block"; setTimeout(()=>{toast.style.display="none";},3000); }
+
+async function loadEvents(){
+    const snapshot = await get(ref(db,"events"));
+    const data = snapshot.exists()?snapshot.val():{};
+    tbody.innerHTML="";
+    for(let id in data){
+        const e = data[id];
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${e.date || "-"}</td>
+            <td>${e.name || "-"}</td>
+            <td>${e.leader || "-"}</td>
+            <td>${e.type || "-"}</td>
+            <td>${e.location || "-"}</td>
+            <td>
+                <button class="actionBtn edit" onclick="window.location.href='edit_event.html?id=${id}'">Bearbeiten</button>
+                <button class="actionBtn delete" onclick="deleteEvent('${id}')">Löschen</button>
+            </td>`;
+        tbody.appendChild(tr);
+    }
+}
+
+async function deleteEvent(id){
+    if(!confirm("Event wirklich löschen?")) return;
+    await remove(ref(db,"events/"+id));
+    showToast("Event gelöscht!");
+    loadEvents();
+}
+
+function logout(){
+    localStorage.removeItem("userType");
+    window.location.href="login.html";
+}
+
+loadEvents();
+</script>
+</body>
+</html>
