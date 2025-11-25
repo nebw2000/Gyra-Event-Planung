@@ -1,9 +1,8 @@
-// Importiere die nötigen Firebase Funktionen
+// Firebase konfigurieren
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-auth.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
 
-// Deine Firebase-Konfiguration
 const firebaseConfig = {
   apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
   authDomain: "event-plan-c4b36.firebaseapp.com",
@@ -15,7 +14,8 @@ const firebaseConfig = {
   measurementId: "G-KRY2MM4JEV"
 };
 
-// Firebase initialisieren
 const app = initializeApp(firebaseConfig);
-export const db = getDatabase(app);
-export const auth = getAuth(app);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+export { app, auth, db };
