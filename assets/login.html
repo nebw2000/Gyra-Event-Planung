@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login</title>
 <style>
-    body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:center; height:100vh; }
-    .container { background:white; padding:30px; border-radius:8px; width:100%; max-width:400px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-    h2 { margin-top:0; color:#0f5f57; }
-    label { display:block; font-weight:bold; margin:10px 0 4px; }
-    select, input { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-bottom:10px; }
-    button { width:100%; padding:10px; margin-top:15px; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
-    #toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
+body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:center; height:100vh; }
+.container { background:white; padding:30px; border-radius:8px; width:100%; max-width:400px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+h2 { margin-top:0; color:#0f5f57; }
+label { display:block; font-weight:bold; margin:10px 0 4px; }
+input, select { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; }
+button { width:100%; padding:10px; margin-top:15px; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
+#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
 </style>
 </head>
 <body>
@@ -22,7 +22,7 @@
 
     <label for="userType">Benutzer</label>
     <select id="userType">
-        <option value="">Bitte wählen</option>
+        <option value="">-- Bitte wählen --</option>
         <option value="admin">Admin</option>
         <option value="teacher">Lehrer*innen</option>
     </select>
@@ -35,24 +35,17 @@
 
 <script>
 const toast = document.getElementById("toast");
-const userType = document.getElementById("userType");
-const passwordField = document.getElementById("password");
-const btn = document.getElementById("loginBtn");
+function showToast(msg){ toast.textContent=msg; toast.style.display="block"; setTimeout(()=>{toast.style.display="none";},3000); }
 
-function showToast(msg){
-    toast.textContent = msg;
-    toast.style.display="block";
-    setTimeout(()=>{toast.style.display="none";},3000);
-}
+document.getElementById("loginBtn").addEventListener("click", ()=>{
+    const type = document.getElementById("userType").value;
+    const pwd = document.getElementById("password").value.trim();
 
-btn.addEventListener("click", ()=>{
-    const type = userType.value;
-    const pass = passwordField.value.trim();
-    if(!type || !pass){ showToast("Bitte Benutzer und Passwort wählen"); return; }
+    if(!type || !pwd){ showToast("Bitte Benutzer und Passwort wählen"); return; }
 
-    if((type==="admin" && pass==="2309") || (type==="teacher" && pass==="event")){
-        showToast("Login erfolgreich!");
-        setTimeout(()=>{ window.location.href="index.html"; },500);
+    if((type==="admin" && pwd==="2309") || (type==="teacher" && pwd==="event")){
+        localStorage.setItem("userType", type); // Merken wer eingeloggt ist
+        window.location.href="index.html";
     } else {
         showToast("Falsches Passwort");
     }
