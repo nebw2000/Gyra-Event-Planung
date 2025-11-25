@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Event Übersicht</title>
+<title>Event Manager</title>
 <style>
 body { font-family: Arial; margin:0; background:#f4f6f8; }
 header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
 header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
-.container { max-width:1200px; margin:auto; padding:20px; }
+.container { max-width:1200px; margin:auto; padding:20px; display:none; }
 #toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
 .event-table { width:100%; border-collapse:collapse; }
 .event-table th, .event-table td { border:1px solid #ccc; padding:8px; text-align:center; }
@@ -25,10 +25,32 @@ button.details { background:#4CAF50; color:white; }
 .modal-content button { margin-top:10px; padding:10px; border:none; border-radius:6px; cursor:pointer; }
 button.save { background:#0f5f57; color:white; width:48%; margin-right:4%; }
 button.cancel { background:#ccc; color:black; width:48%; }
+
+/* Login Styles */
+#loginContainer { display:flex; justify-content:center; align-items:center; height:100vh; background:#f4f6f8; }
+#loginBox { background:white; padding:30px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.2); width:300px; text-align:center; }
+#loginBox h2 { margin-top:0; color:#0f5f57; }
+#loginBox select, #loginBox input { width:100%; margin:10px 0; padding:8px; border-radius:6px; border:1px solid #ccc; }
+#loginBox button { width:100%; padding:10px; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
 </style>
 </head>
 <body>
 
+<!-- Login Container -->
+<div id="loginContainer">
+    <div id="loginBox">
+        <h2>Login</h2>
+        <select id="userType">
+            <option value="Admin">Admin</option>
+            <option value="Lehrer">Lehrer</option>
+        </select>
+        <input type="password" id="password" placeholder="Passwort">
+        <button id="loginBtn">Einloggen</button>
+        <div id="loginMsg" style="color:red;margin-top:5px;"></div>
+    </div>
+</div>
+
+<!-- Hauptseite -->
 <header>
     <h2>Event Übersicht</h2>
     <button id="newEventBtn">Neues Event</button>
@@ -148,7 +170,6 @@ button.cancel { background:#ccc; color:black; width:48%; }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
 import { getDatabase, ref, set, get, remove } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCXX4CwnX_eRiKBURJeORfGoYI0k0hdHkA",
@@ -160,10 +181,8 @@ const firebaseConfig = {
   appId: "1:489710650124:web:05423665acc223a83aff29",
   measurementId: "G-KRY2MM4JEV"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const auth = getAuth(app);
 const toast = document.getElementById("toast");
 
 function showToast(msg){
@@ -172,11 +191,19 @@ function showToast(msg){
     setTimeout(()=>{toast.style.display="none";},3000);
 }
 
-let editingId = null;
-
-/* LOGIN SCHUTZ */
-onAuthStateChanged(auth, user=>{
-    if(!user) window.location.href="login.html";
+/* LOGIN LOGIK */
+const loginContainer = document.getElementById("loginContainer");
+const mainContainer = document.querySelector(".container");
+document.getElementById("loginBtn").addEventListener("click", ()=>{
+    const user = document.getElementById("userType").value;
+    const pass = document.getElementById("password").value;
+    if((user=="Admin" && pass=="2309") || (user=="Lehrer" && pass=="event")){
+        loginContainer.style.display="none";
+        mainContainer.style.display="block";
+        loadEvents();
+    }else{
+        document.getElementById("loginMsg").textContent="Falsches Passwort!";
+    }
 });
 
 /* MODAL HANDLING */
@@ -191,6 +218,7 @@ document.getElementById("cancelBtn").addEventListener("click", ()=>{
 });
 
 /* SPEICHERN */
+let editingId = null;
 document.getElementById("saveEventBtn").addEventListener("click", async ()=>{
     const updated = {
         name: document.getElementById("name").value,
@@ -285,8 +313,7 @@ async function loadEvents(){
         });
     }
 }
-
-loadEvents();
 </script>
 </body>
 </html>
+
