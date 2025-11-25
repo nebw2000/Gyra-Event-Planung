@@ -6,21 +6,28 @@
 <title>Kalender</title>
 <style>
 body { font-family: Arial; margin:0; background:#f4f6f8; }
-header { background:#0f5f57; color:white; padding:15px; display:flex; justify-content:space-between; align-items:center; }
+header { background:#0f5f57; color:white; padding:15px; }
 header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
-.container { max-width:700px; margin:auto; padding:20px; }
+.container { max-width:900px; margin:auto; padding:20px; }
 .calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
-.day { background:white; border-radius:6px; min-height:80px; padding:5px; position:relative; text-align:center; }
-.dot { width:8px; height:8px; background:red; border-radius:50%; display:inline-block; margin-top:5px; }
+.day { background:white; border-radius:6px; min-height:80px; padding:5px; position:relative; }
+.dot { width:8px; height:8px; background:red; border-radius:50%; position:absolute; bottom:5px; right:5px; }
+#monthYear { text-align:center; margin-bottom:10px; font-size:18px; }
 </style>
 </head>
 <body>
 <header>
     <h2>Kalender</h2>
-    <button onclick="window.location.href='index.html'">Zur Übersicht</button>
+    <button onclick="window.location.href='index.html'">Zurück</button>
 </header>
+
 <div class="container">
-    <div id="calendar" class="calendar"></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <button id="prevMonth">&lt; Vorheriger Monat</button>
+        <div id="monthYear"></div>
+        <button id="nextMonth">Nächster Monat &gt;</button>
+    </div>
+    <div class="calendar" id="calendar"></div>
 </div>
 
 <script type="module">
@@ -28,36 +35,55 @@ import { db } from "./firebase-config.js";
 import { ref, get } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
 
 const calendarEl = document.getElementById("calendar");
+const monthYearEl = document.getElementById("monthYear");
 let currentDate = new Date();
 
 async function loadEvents(){
     const snapshot = await get(ref(db,"events"));
-    return snapshot.exists() ? snapshot.val() : {};
+    return snapshot.exists()?snapshot.val():{};
 }
 
 async function drawCalendar(){
     calendarEl.innerHTML="";
-    const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    monthYearEl.textContent = `${year}-${month+1}`;
+
     const firstDay = new Date(year, month, 1).getDay();
-    const lastDate = new Date(year, month+1, 0).getDate();
+    const lastDate = new Date(year, month+1,0).getDate();
     const events = await loadEvents();
-    const eventDays = Object.values(events).map(e=>new Date(e.date).getDate());
 
-    for(let i=0;i<firstDay;i++){ calendarEl.appendChild(document.createElement("div")); }
+    for(let i=0;i<firstDay;i++){
+        calendarEl.appendChild(document.createElement("div"));
+    }
 
-    for(let d=1; d<=lastDate; d++){
+    for(let day=1;day<=lastDate;day++){
         const dayEl = document.createElement("div");
         dayEl.className="day";
-        dayEl.textContent=d;
-        if(eventDays.includes(d)) { 
-            const dot = document.createElement("div"); 
-            dot.className="dot"; 
+        dayEl.textContent = day;
+
+        const hasEvent = Object.values(events).some(ev=>{
+            const d = new Date(ev.date);
+            return d.getFullYear()===year && d.getMonth()===month && d.getDate()===day;
+        });
+        if(hasEvent){
+            const dot = document.createElement("div");
+            dot.className="dot";
             dayEl.appendChild(dot);
         }
+
         calendarEl.appendChild(dayEl);
     }
 }
+
+document.getElementById("prevMonth").addEventListener("click", ()=>{
+    currentDate.setMonth(currentDate.getMonth()-1);
+    drawCalendar();
+});
+document.getElementById("nextMonth").addEventListener("click", ()=>{
+    currentDate.setMonth(currentDate.getMonth()+1);
+    drawCalendar();
+});
 
 drawCalendar();
 </script>
