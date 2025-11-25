@@ -9,7 +9,7 @@
 body {
     margin:0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #001f3f, #003366);
+    background: linear-gradient(135deg, #001233, #002255);
     color: #fff;
 }
 header {
@@ -167,7 +167,6 @@ const db = getDatabase(app);
 const loginBtn = document.getElementById('loginBtn');
 const loginContainer = document.getElementById('loginContainer');
 const mainContainer = document.getElementById('mainContainer');
-
 let currentRole = "";
 
 loginBtn.addEventListener('click', () => {
@@ -217,13 +216,6 @@ function loadEvents(){
                 <p><strong>Leiter:</strong> ${data.leader}</p>
                 <p><strong>Typ:</strong> ${data.type}</p>
                 <p><strong>Ort:</strong> ${data.location}</p>
-                <p><strong>Mikros:</strong> ${data.mic}</p>
-                <p><strong>Gesangsmikros:</strong> ${data.vocals}</p>
-                <p><strong>Rednerpult:</strong> ${data.podium}</p>
-                <p><strong>Beamer:</strong> ${data.beamer}</p>
-                <p><strong>Keyboards:</strong> ${data.keyboard}</p>
-                <p><strong>Gitarren:</strong> ${data.guitar}</p>
-                <p><strong>Kommentar:</strong> ${data.comments}</p>
                 <p><strong>Datum:</strong> ${data.date}</p>
                 ${buttonsHtml}`;
             eventsContainer.appendChild(card);
@@ -233,7 +225,7 @@ function loadEvents(){
 
 // Event löschen
 window.deleteEvent = function(id){
-    if(confirm('Event wirklich löschen?')){
+    if(currentRole==="admin" && confirm('Event wirklich löschen?')){
         remove(ref(db, 'events/'+id));
     }
 }
@@ -248,13 +240,6 @@ window.editEvent = function(id){
         document.getElementById('leader').value=data.leader;
         document.getElementById('type').value=data.type;
         document.getElementById('location').value=data.location;
-        document.getElementById('mic').value=data.mic;
-        document.getElementById('vocals').value=data.vocals;
-        document.getElementById('podium').value=data.podium;
-        document.getElementById('beamer').value=data.beamer;
-        document.getElementById('keyboard').value=data.keyboard;
-        document.getElementById('guitar').value=data.guitar;
-        document.getElementById('comments').value=data.comments;
         document.getElementById('eventDate').value=data.date;
 
         saveEventBtn.onclick = ()=>{
@@ -263,19 +248,13 @@ window.editEvent = function(id){
                 leader: document.getElementById('leader').value,
                 type: document.getElementById('type').value,
                 location: document.getElementById('location').value,
-                mic: document.getElementById('mic').value,
-                vocals: document.getElementById('vocals').value,
-                podium: document.getElementById('podium').value,
-                beamer: document.getElementById('beamer').value,
-                keyboard: document.getElementById('keyboard').value,
-                guitar: document.getElementById('guitar').value,
-                comments: document.getElementById('comments').value,
                 date: document.getElementById('eventDate').value
             });
             addEventForm.reset();
             addEventForm.style.display='none';
             showToast('Event aktualisiert!');
             saveEventBtn.onclick = saveNewEvent;
+            loadEvents();
         };
     });
 }
@@ -287,13 +266,6 @@ function saveNewEvent(){
         leader: document.getElementById('leader').value,
         type: document.getElementById('type').value,
         location: document.getElementById('location').value,
-        mic: document.getElementById('mic').value,
-        vocals: document.getElementById('vocals').value,
-        podium: document.getElementById('podium').value,
-        beamer: document.getElementById('beamer').value,
-        keyboard: document.getElementById('keyboard').value,
-        guitar: document.getElementById('guitar').value,
-        comments: document.getElementById('comments').value,
         date: document.getElementById('eventDate').value
     };
     const eventsRef = ref(db, 'events');
