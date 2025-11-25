@@ -3,25 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Event Übersicht</title>
+<title>Event Planer</title>
 <style>
-body { font-family: Arial, sans-serif; margin:0; background:#f4f6f8; }
-header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
-header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:6px; cursor:pointer; }
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; border-radius:0 0 20px 20px; }
+header button { background:#ffffff33; border:none; padding:8px 14px; color:white; border-radius:10px; cursor:pointer; font-weight:bold; }
 .container { max-width:900px; margin:auto; padding:20px; }
-.event-card { background:white; padding:15px; margin-bottom:10px; border-radius:8px; box-shadow:0 0 5px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; }
+.event-card { background:white; padding:15px; margin-bottom:10px; border-radius:15px; box-shadow:0 3px 6px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; }
 .event-info { flex:1; }
-button { padding:6px 10px; margin-left:5px; border:none; border-radius:6px; cursor:pointer; }
-#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; z-index:1000; }
+button { padding:6px 10px; margin-left:5px; border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
+#toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 20px; color:white; border-radius:15px; display:none; z-index:1000; box-shadow:0 3px 6px rgba(0,0,0,0.2); font-weight:bold; }
 .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
-.modal-content { background:white; padding:20px; border-radius:8px; max-width:500px; width:90%; }
+.modal-content { background:white; padding:25px; border-radius:15px; max-width:500px; width:90%; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
 label { display:block; margin-top:10px; font-weight:bold; }
-input, select, textarea { width:100%; padding:8px; margin-top:4px; border-radius:6px; border:1px solid #ccc; }
-button.save { background:#0f5f57; color:white; margin-top:10px; width:100%; }
+input, select, textarea { width:100%; padding:10px; margin-top:6px; border-radius:10px; border:1px solid #ccc; }
+button.save { background:#0f5f57; color:white; margin-top:15px; width:100%; }
+#loginContainer { display:flex; justify-content:center; align-items:center; height:100vh; }
+#loginBox { background:white; padding:30px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.2); max-width:400px; width:90%; }
+#loginBox h2 { text-align:center; margin-bottom:20px; color:#0f5f57; }
+#loginBox select, #loginBox input { margin-bottom:15px; }
+#loginBox button { background:#0f5f57; color:white; width:100%; padding:10px; font-weight:bold; border-radius:10px; border:none; cursor:pointer; }
 </style>
 </head>
 <body>
 
+<div id="loginContainer">
+  <div id="loginBox">
+    <h2>Login</h2>
+    <label>Benutzer</label>
+    <select id="userType">
+      <option value="admin">Admin</option>
+      <option value="teacher">Lehrer*innen</option>
+    </select>
+    <label>Passwort</label>
+    <input type="password" id="userPassword">
+    <button id="loginBtn">Einloggen</button>
+  </div>
+</div>
+
+<div id="mainContent" style="display:none;">
 <header>
 <h2>Event Übersicht</h2>
 <button id="addEventBtn">Neues Event hinzufügen</button>
@@ -40,18 +60,11 @@ button.save { background:#0f5f57; color:white; margin-top:10px; width:100%; }
 <input type="text" id="eventLeader">
 <label>Typ</label>
 <select id="eventType">
-<option>Probe</option>
-<option>Konzert</option>
-<option>Theater</option>
-<option>Konferenz</option>
-<option>Präsentation</option>
-<option>Rede</option>
-<option>Andere</option>
+<option>Probe</option><option>Konzert</option><option>Theater</option><option>Konferenz</option><option>Präsentation</option><option>Rede</option><option>Andere</option>
 </select>
 <label>Ort</label>
 <select id="eventLocation">
-<option>Atrium</option>
-<option>Forum</option>
+<option>Atrium</option><option>Forum</option>
 </select>
 <label>Datum</label>
 <input type="date" id="eventDate">
@@ -67,15 +80,11 @@ button.save { background:#0f5f57; color:white; margin-top:10px; width:100%; }
 </select>
 <label>Rednerpult?</label>
 <select id="eventPodium">
-<option>Nein</option>
-<option>Ja</option>
+<option>Nein</option><option>Ja</option>
 </select>
 <label>Beamer</label>
 <select id="eventBeamer">
-<option>Nein</option>
-<option>Ja Bühne</option>
-<option>Ja Wand</option>
-<option>Ja beide</option>
+<option>Nein</option><option>Ja Bühne</option><option>Ja Wand</option><option>Ja beide</option>
 </select>
 <label>Keyboards</label>
 <select id="eventKeyboard">
@@ -90,9 +99,16 @@ button.save { background:#0f5f57; color:white; margin-top:10px; width:100%; }
 <button class="save" id="saveEventBtn">Speichern</button>
 </div>
 </div>
+</div>
 
 <script type="module">
 import { saveEvent, updateEvent, deleteEvent, loadEvents } from './firebase.js';
+
+const loginContainer = document.getElementById("loginContainer");
+const mainContent = document.getElementById("mainContent");
+const loginBtn = document.getElementById("loginBtn");
+const userType = document.getElementById("userType");
+const userPassword = document.getElementById("userPassword");
 
 const eventsContainer = document.getElementById("eventsContainer");
 const toast = document.getElementById("toast");
@@ -118,10 +134,23 @@ const commentField = document.getElementById("eventComment");
 
 let editEventId = null;
 
-// Toast anzeigen
+// Login
+loginBtn.addEventListener("click", ()=>{
+    const type = userType.value;
+    const pass = userPassword.value;
+    if((type==="admin" && pass==="2309") || (type==="teacher" && pass==="event")){
+        loginContainer.style.display="none";
+        mainContent.style.display="block";
+        loadAllEvents();
+    } else{
+        alert("Falsches Passwort!");
+    }
+});
+
+// Toast
 function showToast(msg){
     toast.textContent = msg;
-    toast.style.display = "block";
+    toast.style.display="block";
     setTimeout(()=>{toast.style.display="none";},3000);
 }
 
@@ -129,8 +158,7 @@ function showToast(msg){
 addEventBtn.addEventListener("click", ()=>{
     modal.style.display="flex";
     modalTitle.textContent="Neues Event";
-    editEventId = null;
-    // Felder leeren
+    editEventId=null;
     nameField.value="";
     leaderField.value="";
     typeField.value="Probe";
@@ -168,54 +196,57 @@ saveEventBtn.addEventListener("click", ()=>{
     };
 
     if(!editEventId){
-        saveEvent(data);
-        showToast("Event gespeichert!");
-    }else{
-        updateEvent(editEventId, data);
-        showToast("Event aktualisiert!");
+        saveEvent(data).then(()=>{ 
+            showToast("Event gespeichert!"); 
+        });
+    } else{
+        updateEvent(editEventId,data).then(()=>{
+            showToast("Event aktualisiert!");
+        });
     }
-
     modal.style.display="none";
 });
 
 // Events laden und rendern
-loadEvents((events)=>{
-    eventsContainer.innerHTML="";
-    events.forEach(ev=>{
-        const card = document.createElement("div");
-        card.className="event-card";
-        const info = document.createElement("div");
-        info.className="event-info";
-        info.innerHTML=`<strong>${ev.name}</strong> von ${ev.leader} <br> ${ev.type} am ${ev.date} ${ev.time}`;
-        const btnEdit = document.createElement("button");
-        btnEdit.textContent="Bearbeiten";
-        btnEdit.onclick=()=>{
-            editEventId=ev.id;
-            modal.style.display="flex";
-            modalTitle.textContent="Event bearbeiten";
-            nameField.value=ev.name;
-            leaderField.value=ev.leader;
-            typeField.value=ev.type;
-            locationField.value=ev.location;
-            dateField.value=ev.date;
-            timeField.value=ev.time;
-            micField.value=ev.mic;
-            singingMicField.value=ev.singingMic;
-            podiumField.value=ev.podium;
-            beamerField.value=ev.beamer;
-            keyboardField.value=ev.keyboard;
-            guitarField.value=ev.guitar;
-            commentField.value=ev.comment;
-        };
-        const btnDelete = document.createElement("button");
-        btnDelete.textContent="Löschen";
-        btnDelete.onclick=()=>{deleteEvent(ev.id); showToast("Event gelöscht!");};
-        info.appendChild(btnEdit);
-        info.appendChild(btnDelete);
-        card.appendChild(info);
-        eventsContainer.appendChild(card);
+function loadAllEvents(){
+    loadEvents((events)=>{
+        eventsContainer.innerHTML="";
+        events.forEach(ev=>{
+            const card = document.createElement("div");
+            card.className="event-card";
+            const info = document.createElement("div");
+            info.className="event-info";
+            info.innerHTML=`<strong>${ev.name}</strong> von ${ev.leader} <br> ${ev.type} am ${ev.date} ${ev.time}`;
+            const btnEdit = document.createElement("button");
+            btnEdit.textContent="Bearbeiten";
+            btnEdit.onclick=()=>{
+                editEventId=ev.id;
+                modal.style.display="flex";
+                modalTitle.textContent="Event bearbeiten";
+                nameField.value=ev.name;
+                leaderField.value=ev.leader;
+                typeField.value=ev.type;
+                locationField.value=ev.location;
+                dateField.value=ev.date;
+                timeField.value=ev.time;
+                micField.value=ev.mic;
+                singingMicField.value=ev.singingMic;
+                podiumField.value=ev.podium;
+                beamerField.value=ev.beamer;
+                keyboardField.value=ev.keyboard;
+                guitarField.value=ev.guitar;
+                commentField.value=ev.comment;
+            };
+            const btnDelete = document.createElement("button");
+            btnDelete.textContent="Löschen";
+            btnDelete.onclick=()=>{deleteEvent(ev.id).then(()=>{showToast("Event gelöscht!");});};
+            info.appendChild(btnEdit);
+            info.appendChild(btnDelete);
+            card.appendChild(info);
+            eventsContainer.appendChild(card);
+        });
     });
-});
+}
 </script>
 </body>
 </html>
