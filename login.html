@@ -5,35 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login</title>
 <style>
-body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:center; height:100vh; }
-.container { background:white; padding:30px; border-radius:8px; width:100%; max-width:400px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-h2 { margin-top:0; color:#0f5f57; }
-label { display:block; font-weight:bold; margin:10px 0 4px; }
-input, select { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; }
-button { width:100%; padding:10px; margin-top:15px; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
-#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
+    body { font-family: Arial; margin:0; background:#f4f6f8; display:flex; justify-content:center; align-items:center; height:100vh; }
+    .container { background:white; padding:30px; border-radius:8px; width:100%; max-width:400px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    h2 { margin-top:0; color:#0f5f57; }
+    label { display:block; font-weight:bold; margin:10px 0 4px; }
+    input, select { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; }
+    button { width:100%; padding:10px; margin-top:15px; border:none; border-radius:6px; background:#0f5f57; color:white; cursor:pointer; }
+    #toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
 </style>
 </head>
 <body>
+
 <div class="container">
     <div id="toast"></div>
     <h2>Login</h2>
+
     <label for="role">Benutzer</label>
     <select id="role">
         <option value="admin">Admin</option>
         <option value="teacher">Lehrer*innen</option>
     </select>
+
     <label for="password">Passwort</label>
     <input id="password" type="password" required>
+
     <button id="loginBtn">Login</button>
 </div>
 
-<script type="module">
-import { auth } from "./firebase-config.js";
-
-const btn = document.getElementById("loginBtn");
-const role = document.getElementById("role");
+<script>
+const roleField = document.getElementById("role");
 const passwordField = document.getElementById("password");
+const btn = document.getElementById("loginBtn");
 const toast = document.getElementById("toast");
 
 function showToast(msg){
@@ -42,16 +44,24 @@ function showToast(msg){
     setTimeout(()=>{toast.style.display="none";},3000);
 }
 
-btn.addEventListener("click", ()=> {
-    const selected = role.value;
+btn.addEventListener("click", ()=>{
+    const role = roleField.value;
     const password = passwordField.value.trim();
-    if((selected==="admin" && password==="2309") || (selected==="teacher" && password==="event")){
-        localStorage.setItem("userRole", selected);
-        window.location.href="index.html";
+
+    if(!password){
+        showToast("Bitte Passwort eingeben");
+        return;
+    }
+
+    // Prüfen, ob Passwort korrekt ist
+    if((role === "admin" && password === "2309") || (role === "teacher" && password === "event")){
+        showToast("Login erfolgreich!");
+        setTimeout(()=>{ window.location.href="index.html"; },500);
     } else {
         showToast("Falsches Passwort");
     }
 });
 </script>
+
 </body>
 </html>
