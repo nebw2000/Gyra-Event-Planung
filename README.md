@@ -1,1 +1,0 @@
-# Gyra-Event-Planung
