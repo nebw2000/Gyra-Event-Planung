@@ -5,19 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Event Manager</title>
 <style>
-body { font-family: Arial; margin:0; background:#f4f6f8; }
-header { background:#0f5f57; color:white; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; }
-header h2 { margin:0; }
-header button { background:white; color:#0f5f57; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; }
-.container { max-width:900px; margin:auto; padding:20px; }
-#toast { position:fixed; top:15px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:10px 14px; color:white; border-radius:8px; display:none; }
-.event-card { background:white; border-radius:8px; padding:10px 15px; margin-bottom:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; }
+body { font-family: 'Segoe UI', sans-serif; margin:0; background:#eef1f5; }
+header { background:#0f5f57; color:white; padding:20px 30px; display:flex; justify-content:space-between; align-items:center; }
+header h2 { margin:0; font-size:24px; }
+header button { background:white; color:#0f5f57; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; transition:0.2s; }
+header button:hover { background:#d4f0eb; }
+.container { max-width:1000px; margin:auto; padding:20px; }
+#toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f5f57; padding:12px 20px; color:white; border-radius:10px; display:none; font-weight:bold; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+#search { width:100%; padding:10px; margin-bottom:20px; border-radius:8px; border:1px solid #ccc; font-size:16px; }
+
+.event-card { background:white; border-radius:10px; padding:15px 20px; margin-bottom:15px; box-shadow:0 3px 6px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; transition:0.2s; }
+.event-card:hover { transform:scale(1.01); }
 .event-card div { display:flex; flex-direction:column; }
-.event-card button { margin-left:5px; padding:4px 8px; border:none; border-radius:5px; cursor:pointer; }
-#addEventForm { background:white; padding:20px; border-radius:8px; margin-bottom:20px; display:none; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-input, select { width:100%; padding:6px 8px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc; }
-button.save { background:#0f5f57; color:white; width:100%; padding:10px; border:none; border-radius:6px; cursor:pointer; }
-#search { width:100%; padding:6px 8px; margin-bottom:20px; border-radius:6px; border:1px solid #ccc; }
+.event-card button { margin-left:8px; padding:6px 10px; border:none; border-radius:6px; cursor:pointer; transition:0.2s; }
+.event-card button:hover { opacity:0.8; }
+
+#addEventForm { background:white; padding:25px; border-radius:12px; margin-bottom:30px; display:none; box-shadow:0 3px 6px rgba(0,0,0,0.15); }
+#addEventForm h3 { margin-top:0; margin-bottom:15px; font-size:22px; }
+input, select { width:100%; padding:8px 10px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc; font-size:15px; }
+button.save { background:#0f5f57; color:white; width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer; font-size:16px; transition:0.2s; }
+button.save:hover { background:#0c4d46; }
+
+@media(max-width:600px){
+    header { flex-direction:column; align-items:flex-start; }
+    header button { margin-top:10px; }
+}
 </style>
 </head>
 <body>
@@ -57,51 +69,27 @@ button.save { background:#0f5f57; color:white; width:100%; padding:10px; border:
         <input id="datetime" type="datetime-local">
         <label>Microfone</label>
         <select id="mic">
-            <option>0</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5 oder mehr</option>
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5 oder mehr</option>
         </select>
         <label>Gesangs-Mic</label>
         <select id="vocals">
-            <option>0</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5 oder mehr</option>
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5 oder mehr</option>
         </select>
         <label>Rednerpult</label>
         <select id="podium">
-            <option>Ja</option>
-            <option>Nein</option>
+            <option>Ja</option><option>Nein</option>
         </select>
         <label>Beamer</label>
         <select id="beamer">
-            <option>Ja Bühne</option>
-            <option>Ja Wand</option>
-            <option>Ja beide</option>
-            <option>Nein</option>
+            <option>Ja Bühne</option><option>Ja Wand</option><option>Ja beide</option><option>Nein</option>
         </select>
         <label>Keyboards</label>
         <select id="keyboard">
-            <option>0</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5 oder mehr</option>
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5 oder mehr</option>
         </select>
         <label>Gitarren</label>
         <select id="guitar">
-            <option>0</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5 oder mehr</option>
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5 oder mehr</option>
         </select>
         <label>Kommentar (optional)</label>
         <input id="comments" type="text">
@@ -124,9 +112,8 @@ function showToast(msg){
 }
 
 const addEventForm = document.getElementById("addEventForm");
-document.getElementById("showAddEvent").onclick = ()=>{ addEventForm.style.display="block"; };
+document.getElementById("showAddEvent").onclick = ()=>{ addEventForm.style.display="block"; window.scrollTo(0,0); };
 
-// Event speichern
 document.getElementById("saveBtn").onclick = async ()=>{
     const id = Date.now().toString();
     const eventData = {
@@ -148,6 +135,7 @@ document.getElementById("saveBtn").onclick = async ()=>{
     showToast("Event erfolgreich gespeichert!");
     addEventForm.style.display="none";
     loadEvents();
+    window.scrollTo(0,0);
 };
 
 // Events laden
