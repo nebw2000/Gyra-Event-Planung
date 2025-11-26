@@ -39,12 +39,19 @@ Dieses Projekt ermöglicht das Anlegen, Bearbeiten und Löschen von Events versc
 event-planer/
 
 ├── index.html        # Hauptseite mit Event-Übersicht und Login
-├── css/│   
+
+├── css/│
+
     └── index.css     # Styling und Layout
-├── js/│   
+    
+├── js/│ 
+
     └── index.js      # Geschäftslogik, Firebase-Anbindung
+    
 ├── firebase.js       # Firebase Initialisierung und Exporte
+
 ├── firebase-config.js# Firebase Konfiguration (API Keys)
+
 └── README.md         # Dieses Dokument
 ---
 
