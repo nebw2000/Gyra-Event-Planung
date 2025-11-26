@@ -44,7 +44,7 @@ event-planer/
 
     └── index.css     # Styling und Layout
     
-├── js/│ 
+├── js/│
 
     └── index.js      # Geschäftslogik, Firebase-Anbindung
     
@@ -53,6 +53,7 @@ event-planer/
 ├── firebase-config.js# Firebase Konfiguration (API Keys)
 
 └── README.md         # Dieses Dokument
+
 ---
 
 ## Design & Usability
