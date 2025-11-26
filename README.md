@@ -67,12 +67,6 @@ Der Demo-Login unterscheidet zwischen Admin und Lehrer, jeweils mit festgelegten
 
 ---
 
-## Mitmachen
-
-Dieses Projekt lebt von Beiträgen! Vorschläge, Bugfixes oder Erweiterungen sind herzlich willkommen. Einfach Fork erstellen, Änderung vornehmen und Pull Request eröffnen.
-
----
-
 ## Danksagung
 
 Ein großes Dankeschön an Firebase für die unkomplizierte und leistungsstarke Datenlösung sowie an die Open-Source-Community für Tools und Inspiration.
