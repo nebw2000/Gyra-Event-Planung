@@ -35,6 +35,7 @@ Dieses Projekt ermöglicht das Anlegen, Bearbeiten und Löschen von Events versc
 ---
 
 ## Projektstruktur
+
 event-planer/
 ├── index.html        # Hauptseite mit Event-Übersicht und Login
 ├── css/│   
